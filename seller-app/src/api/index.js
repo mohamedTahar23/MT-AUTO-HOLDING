@@ -8,14 +8,15 @@
 //   Reads (RLS-guarded):  getShop, getShopUsers, getTasks (seller_task_v),
 //                         getOffers, getOrders, getPayouts, getPerformance,
 //                         getMessages, getAnnouncements, getMeta
-//   Auth:                 requestOtp, verifyOtp, applyShop (apply_shop),
-//                         currentSession, signOut
+//   Auth:                 requestOtp, verifyOtp, signInWithGoogle,
+//                         applyShop (apply_shop), currentSession, signOut
 //   RPC mutations:        submitOffer (submit_offer), withdrawOffer (withdraw_offer),
 //                         uploadProof (upload_proof), markHandover (mark_handover),
 //                         reconfirmOffer (reconfirm_offer)
 //
 // Real adapter sketch (supabase.js):
 //   verifyOtp(email, code) -> supabase.auth.verifyOtp({ email, token: code, type: 'email' })
+//   signInWithGoogle()     -> supabase.auth.signInWithOAuth({ provider: 'google' })
 //   getTasks()             -> supabase.from('seller_task_v').select('*')
 //   submitOffer(payload)   -> supabase.rpc('submit_offer', { ...payload })  // carries acted_by server-side
 //   uploadProof(id, file)  -> upload to the private `proof-raw` bucket, then rpc('upload_proof', ...)

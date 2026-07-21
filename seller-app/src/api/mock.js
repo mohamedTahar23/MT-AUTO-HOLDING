@@ -82,6 +82,17 @@ export const mockApi = {
     return { session: clone(session), shop: clone(db.shop) }
   },
 
+  async signInWithGoogle() {
+    await delay(700)
+    // Mock: Google OAuth resolves straight to the demo owner account. Real
+    // adapter: supabase.auth.signInWithOAuth({ provider: 'google' }) + session
+    // pickup on redirect.
+    const user = db.users.find((u) => u.id === seed.knownAccounts['owner@alamine-parts.dz'])
+    writeSession({ shopId: db.shop.id, user })
+    logEvent('login', 'google:owner@alamine-parts.dz')
+    return { session: clone(session), shop: clone(db.shop) }
+  },
+
   async applyShop(payload) {
     await delay(600)
     // apply_shop RPC — creates a pending shop in "قيد المراجعة".
