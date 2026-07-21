@@ -63,7 +63,8 @@ seller-app/
    │  └─ seed.js              # demo data shaped like the Data Contract
    ├─ styles/                 # site.css (reused) · tokens.css · app.css
    └─ components/
-      ├─ auth/                # LoginGate (marketing + sign-in) · Otp · ApplyForm · UnderReview
+      ├─ auth/                # LoginGate (landing orchestrator) · Otp · ApplyForm · UnderReview
+      ├─ landing/             # the full marketing landing, one component per design section
       ├─ shell/               # AppShell · Header · Sidebar · R2Banner
       ├─ screens/             # Queue · MyOffers · Deliveries · Payouts · Performance · Messages · Feed
       ├─ modals/              # OfferModal · WithdrawModal · VideoModal
@@ -97,6 +98,7 @@ change one import. Mapping:
 | App method | Real implementation |
 |---|---|
 | `requestOtp` / `verifyOtp` | `supabase.auth.signInWithOtp` / `auth.verifyOtp` (email OTP) |
+| `signInWithGoogle` | `supabase.auth.signInWithOAuth({ provider: 'google' })` + session pickup on redirect (mock: resolves straight to the demo owner) |
 | `applyShop(payload)` | RPC `apply_shop` (SELLER-2 enrollment payload) |
 | `getTasks()` | `from('seller_task_v').select()` — anonymised, RLS-scoped to the shop |
 | `getOffers` / `getOrders` / `getPayouts` | own-rows reads under RLS |
@@ -114,6 +116,14 @@ checks as fast-feedback and treat the RPCs as the source of truth.
 This build covers the **core seller loop**: marketing/login gate → OTP → join request →
 under-review → pricing queue → offer modal (multi-brand) → withdraw window → proof video →
 handover → deliveries tracking → payouts → performance → messages → announcements → R2 state.
+
+The landing page (`src/components/landing/`) implements **every section of the seller design
+page**, top to bottom: header with the FR/AR toggle · hero + example pricing card (MT-14902)
+· the نحن/أنت/10% navy band · كيف يعمل (01–04) · فريق المحل (employee invitations + team
+card) · سوق الجملة (قريباً + the parts-search-engine example) · sign-in (Google + email OTP)
+· contact (address / phone / directions + map-image drop placeholder) · navy "تابعنا" social
+footer. Notes: the FR side of the language toggle is visual-only until French content ships;
+the map drop-area previews the image client-side only (nothing is uploaded).
 
 Remaining screens from the prototype, stubbed as «قيد الإنشاء» pages: team & permissions
 (دعوة الموظفين + perms editor), account settings, staff activity log, employee invite

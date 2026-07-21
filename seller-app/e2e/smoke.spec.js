@@ -16,6 +16,62 @@ test('landing gate renders in Arabic RTL', async ({ page }) => {
   await expect(page.getByTestId('send-code')).toBeVisible()
 })
 
+test('landing shows every design section top to bottom', async ({ page }) => {
+  await page.goto('/')
+
+  // §1 header: FR/AR language toggle.
+  const toggle = page.getByRole('group', { name: 'اللغة' })
+  await expect(toggle.getByRole('button', { name: 'AR' })).toBeVisible()
+  await expect(toggle.getByRole('button', { name: 'FR' })).toBeVisible()
+
+  // §2 hero: example pricing card figures.
+  await expect(page.getByText('Alternateur — Hyundai i10 2016')).toBeVisible()
+  await expect(page.getByText('MT-14902')).toBeVisible()
+  await expect(page.getByText('16,650')).toBeVisible()
+
+  // §3 the نحن / أنت / 10% band.
+  await expect(page.getByText('من يحدّد السعر.')).toBeVisible()
+
+  // §4 كيف يعمل (4 numbered cards).
+  await expect(page.getByText('إذا توفّرت لديك القطعة قدّم عرضك.')).toBeVisible()
+
+  // §5 فريق المحل: employee invitation.
+  await expect(page.getByRole('heading', { name: /أضِف موظفيك لتقديم العروض مكانك/ })).toBeVisible()
+  await expect(page.getByText('yacine@atlas-pieces.dz')).toBeVisible()
+  await expect(page.getByText('samir@atlas-pieces.dz')).toBeVisible()
+  await expect(page.getByText('٣ موظفين')).toBeVisible()
+  await expect(page.getByRole('button', { name: '+ دعوة موظف' })).toBeVisible()
+
+  // §6 سوق الجملة: قريباً + the search-engine example.
+  await expect(page.getByRole('heading', { name: 'اشترِ بسعر الجملة الحقيقي.' })).toBeVisible()
+  await expect(page.getByText('قريباً', { exact: true })).toBeVisible()
+  await expect(page.getByText('Tendeur de chaîne')).toBeVisible()
+  await expect(page.getByText('Mobis')).toBeVisible()
+  await expect(page.getByText('KFM')).toBeVisible()
+
+  // §7 sign-in: Google + «أو» divider + email form.
+  await expect(page.getByTestId('google-signin')).toBeVisible()
+  await expect(page.getByText('أو', { exact: true })).toBeVisible()
+  await expect(page.getByPlaceholder('vendeur@mtauto.cloud')).toBeVisible()
+
+  // §8 contact.
+  await expect(page.getByText('الحجّار، ولاية عنابة — «محل محمد الطاهر لبيع قطع غيار السيارات»')).toBeVisible()
+  await expect(page.getByText('0659 40 13 38')).toBeVisible()
+  await expect(page.getByRole('link', { name: 'احصل على الاتجاهات' })).toBeVisible()
+
+  // §9 footer: تابعنا + the five social links.
+  await expect(page.getByRole('heading', { name: 'تابعنا' })).toBeVisible()
+  for (const s of ['واتساب', 'اليوتيوب', 'تيك توك', 'إنستغرام', 'فيسبوك']) {
+    await expect(page.locator('.land-social').getByRole('link', { name: s })).toBeVisible()
+  }
+})
+
+test('متابعة عبر Google signs into the demo shop', async ({ page }) => {
+  await page.goto('/')
+  await page.getByTestId('google-signin').click()
+  await expect(page.getByRole('heading', { name: 'طابور التسعير' })).toBeVisible()
+})
+
 test('sign in → pricing queue → submit an offer', async ({ page }) => {
   await page.goto('/')
 
