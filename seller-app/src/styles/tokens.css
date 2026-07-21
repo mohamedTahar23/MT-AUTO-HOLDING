@@ -1,0 +1,86 @@
+/*
+ * Design tokens for the MT AUTO Seller portal.
+ *
+ * The full token system lives in site.css (reused verbatim from the design bundle,
+ * same as the buyer app). This file layers the *seller-app* specifics on top and is
+ * the single place to adjust brand values if you ever fork them from the buyer app.
+ *
+ * Canonical brand tokens (kept identical to the buyer app / site.css :root):
+ *   navy  --navy-900 #0A1830   amber  --amber #FF8A1F   font  Cairo
+ */
+:root {
+  /* Re-assert the brand primitives so the seller app is correct even if site.css
+     is swapped for a slimmer build. These MUST match the buyer app. */
+  --navy-900: #0a1830;
+  --navy-850: #0e2042;
+  --navy-800: #143058;
+  --navy-700: #1d3f73;
+  --amber: #ff8a1f;
+  --amber-h: #f0780a;
+  --amber-soft: #fff3e6;
+  --amber-line: #ffd8ae;
+  --amber-text: #b45309;
+
+  /* App-level aliases (semantic names the components read) */
+  --font-sans: 'Cairo', system-ui, 'Segoe UI', sans-serif;
+  --font-mono: 'IBM Plex Mono', ui-monospace, 'SFMono-Regular', monospace;
+  --header-h: 64px;
+  --nav-w: 248px;
+}
+
+html,
+body {
+  margin: 0;
+  background: var(--bg, #f4f6fa);
+}
+
+body {
+  font-family: var(--font-sans);
+  color: var(--ink, #15212f);
+  -webkit-font-smoothing: antialiased;
+  text-rendering: optimizeLegibility;
+}
+
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
+/* Every count, price, ref and timer uses tabular figures (design-reference §3). */
+.tnum,
+.mono {
+  font-variant-numeric: tabular-nums;
+}
+.mono {
+  font-family: var(--font-mono);
+}
+
+/* LTR islands for refs / phones / plates / prices inside an RTL document. */
+.ltr {
+  direction: ltr;
+  unicode-bidi: isolate;
+}
+
+a {
+  color: var(--amber-text);
+  text-decoration: none;
+}
+a:hover {
+  text-decoration: underline;
+}
+
+:focus-visible {
+  outline: 2px solid var(--navy-850);
+  outline-offset: 2px;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.001ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.001ms !important;
+  }
+}

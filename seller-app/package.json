@@ -1,0 +1,23 @@
+{
+  "name": "mt-auto-seller",
+  "private": true,
+  "version": "0.1.0",
+  "type": "module",
+  "description": "MT AUTO — Seller portal (بوابة البائعين). React + Vite, Arabic RTL. Backend mocked; see README swap-in points.",
+  "scripts": {
+    "dev": "vite",
+    "build": "vite build",
+    "preview": "vite preview --port 4174",
+    "test:e2e": "playwright test",
+    "test:e2e:install": "playwright install chromium"
+  },
+  "dependencies": {
+    "react": "^18.3.1",
+    "react-dom": "^18.3.1"
+  },
+  "devDependencies": {
+    "@playwright/test": "^1.48.0",
+    "@vitejs/plugin-react": "^4.3.4",
+    "vite": "^5.4.11"
+  }
+}

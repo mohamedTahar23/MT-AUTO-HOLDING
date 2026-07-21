@@ -1,0 +1,276 @@
+// ---------------------------------------------------------------------------
+// Mock backend adapter.
+//
+// Implements the same interface the real Supabase adapter must implement (see
+// ./index.js and the README "Swap-in points" table). All state is in-memory and
+// resets on reload, except the session which is persisted to localStorage so a
+// refresh keeps you signed in.
+//
+// Business rules encoded here come straight from handoff/prompts/03 - Seller
+// Portal.md and the Data Contract:
+//   • price ≥3 and ≤7 digits
+//   • buyer_note ≤240 chars
+//   • withdraw is free within 15 min of submitting; later → warned + counted,
+//     3rd late withdrawal → R2 restriction
+//   • proof video has a 24h window; every mutation carries acted_by + logs an event
+// ---------------------------------------------------------------------------
+import * as seed from './seed.js'
+import { WITHDRAW_WINDOW_MS } from '../lib/format.js'
+
+const SESSION_KEY = 'mtseller.session'
+const delay = (ms = 320) => new Promise((r) => setTimeout(r, ms))
+const clone = (v) => JSON.parse(JSON.stringify(v))
+const uid = (p) => `${p}_${Math.random().toString(36).slice(2, 8)}`
+
+// Mutable in-memory state (seeded once).
+const db = {
+  shop: clone(seed.shop),
+  users: clone(seed.shopUsers),
+  tasks: clone(seed.tasks),
+  offers: clone(seed.offers),
+  orders: clone(seed.orders),
+  payouts: clone(seed.payouts),
+  messages: clone(seed.messages),
+  events: [],
+}
+
+let session = readSession()
+
+function readSession() {
+  try {
+    return JSON.parse(localStorage.getItem(SESSION_KEY) || 'null')
+  } catch {
+    return null
+  }
+}
+function writeSession(s) {
+  session = s
+  if (s) localStorage.setItem(SESSION_KEY, JSON.stringify(s))
+  else localStorage.removeItem(SESSION_KEY)
+}
+
+function requireSession() {
+  if (!session) throw new Error('غير مسجّل الدخول')
+  return session
+}
+
+/** Append-only audit event (the backbone every action writes to). */
+function logEvent(kind, note = '') {
+  const actor = session
+    ? { side: 'seller', user_id: session.user.id, name: session.user.name, role: session.user.role }
+    : { side: 'seller' }
+  db.events.push({ at: new Date().toISOString(), actor, kind, note, manual: false })
+}
+
+export const mockApi = {
+  // ---- auth ---------------------------------------------------------------
+  async requestOtp(email) {
+    await delay()
+    const known = Boolean(seed.knownAccounts[email.trim().toLowerCase()])
+    // In real life the OTP is emailed. Mock: accept any 6 digits (hint: 000000).
+    return { ok: true, known }
+  },
+
+  async verifyOtp(email, code) {
+    await delay()
+    if (!/^\d{6}$/.test(String(code))) throw new Error('الرمز يجب أن يكون 6 أرقام')
+    const userId = seed.knownAccounts[email.trim().toLowerCase()]
+    if (!userId) throw new Error('unknown-email') // caller routes to the apply form
+    const user = db.users.find((u) => u.id === userId)
+    writeSession({ shopId: db.shop.id, user })
+    logEvent('login', email)
+    return { session: clone(session), shop: clone(db.shop) }
+  },
+
+  async applyShop(payload) {
+    await delay(600)
+    // apply_shop RPC — creates a pending shop in "قيد المراجعة".
+    db.shop = {
+      ...db.shop,
+      name: payload.gShopName || db.shop.name,
+      wilaya: payload.gWilaya || db.shop.wilaya,
+      phone: payload.gPhone1 || db.shop.phone,
+      address: payload.gAddress || db.shop.address,
+      mapsUrl: payload.gMapsUrl || db.shop.mapsUrl,
+      status: 'review',
+    }
+    const owner = { ...db.users[0], name: payload.gOwner || db.users[0].name }
+    writeSession({ shopId: db.shop.id, user: owner })
+    logEvent('apply_shop', payload.gShopName)
+    return { status: 'review', shop: clone(db.shop) }
+  },
+
+  currentSession() {
+    return session ? clone(session) : null
+  },
+
+  async signOut() {
+    logEvent('logout')
+    writeSession(null)
+  },
+
+  // ---- reads --------------------------------------------------------------
+  async getShop() {
+    await delay(120)
+    return clone(db.shop)
+  },
+  async getShopUsers() {
+    await delay(120)
+    return clone(db.users)
+  },
+  async getTasks() {
+    await delay()
+    requireSession()
+    if (db.shop.r2.active) return [] // blocked server-side while restricted
+    return clone(db.tasks)
+  },
+  async getOffers() {
+    await delay()
+    requireSession()
+    return clone(db.offers)
+  },
+  async getOrders() {
+    await delay()
+    requireSession()
+    return clone(db.orders)
+  },
+  async getPayouts() {
+    await delay()
+    requireSession()
+    return clone(db.payouts)
+  },
+  async getPerformance() {
+    await delay(160)
+    return clone(seed.performance)
+  },
+  async getMessages() {
+    await delay(160)
+    return clone(db.messages)
+  },
+  async sendMessage(text) {
+    await delay(160)
+    requireSession()
+    const msg = { id: uid('m'), from: 'shop', at: new Date().toISOString(), text }
+    db.messages.push(msg)
+    logEvent('message', text.slice(0, 60))
+    return clone(msg)
+  },
+  async getAnnouncements() {
+    await delay(120)
+    return clone(seed.announcements)
+  },
+  getMeta() {
+    return { countries: seed.countries, brandChips: seed.brandChips, wilayas: seed.wilayas }
+  },
+
+  // ---- RPC mutations ------------------------------------------------------
+  // submit_offer — validates and appends a competing offer row.
+  async submitOffer({ taskId, price, brand, country, buyer_note = '', commit_agree, partNo = '' }) {
+    await delay(420)
+    const s = requireSession()
+    if (db.shop.r2.active) throw new Error('حسابك مقيّد حالياً')
+    if (!s.user.perms?.pricing) throw new Error('لا تملك صلاحية التسعير')
+    const digits = String(price).replace(/\D/g, '')
+    if (digits.length < 3 || digits.length > 7) throw new Error('السعر يجب أن يكون بين 3 و7 أرقام')
+    if (!brand?.trim()) throw new Error('الماركة مطلوبة (قطع جديدة فقط)')
+    if (!country) throw new Error('بلد الصنع مطلوب')
+    if (buyer_note.length > 240) throw new Error('الملاحظة أطول من 240 حرفاً')
+    if (!commit_agree) throw new Error('يجب الموافقة على الالتزامات')
+
+    const task = db.tasks.find((t) => t.id === taskId)
+    const offer = {
+      id: uid('of'),
+      taskId,
+      partName: task?.part?.name || '',
+      car: task ? `${task.car.make} ${task.car.model} ${task.car.year}` : '',
+      price: Number(digits),
+      brand: brand.trim(),
+      country,
+      note: buyer_note.trim(),
+      partNo: partNo.trim(),
+      status: 'sent',
+      submittedAt: new Date().toISOString(),
+      actedBy: s.user.id,
+      competingShops: task?.competingShops ?? 0,
+    }
+    // Dedupe same shop + same brand on the same request.
+    const dup = db.offers.find((o) => o.taskId === taskId && o.brand === offer.brand && o.status === 'sent')
+    if (dup) throw new Error('لديك عرض بنفس الماركة على هذا الطلب')
+    db.offers.unshift(offer)
+    logEvent('submit_offer', `${taskId} · ${brand} · ${offer.price}`)
+    return clone(offer)
+  },
+
+  // withdraw_offer — free within the 15-min window, else warned + counted.
+  async withdrawOffer(offerId) {
+    await delay(300)
+    requireSession()
+    const offer = db.offers.find((o) => o.id === offerId)
+    if (!offer) throw new Error('العرض غير موجود')
+    const late = Date.now() - new Date(offer.submittedAt).getTime() > WITHDRAW_WINDOW_MS
+    offer.status = 'withdrawn'
+    offer.withdrawnAt = new Date().toISOString()
+    let r2Triggered = false
+    if (late) {
+      db.shop.withdraw_warns = Math.min(3, db.shop.withdraw_warns + 1)
+      if (db.shop.withdraw_warns >= 3) {
+        db.shop.r2 = {
+          active: true,
+          reason: 'ثلاث عمليات سحب متأخرة للعروض',
+          since: new Date().toISOString(),
+          lifted_by: null,
+          lifted_at: null,
+        }
+        r2Triggered = true
+      }
+    }
+    logEvent('withdraw_offer', `${offerId}${late ? ' (متأخر)' : ''}`)
+    return { late, warns: db.shop.withdraw_warns, r2Triggered, shop: clone(db.shop) }
+  },
+
+  // upload_proof — one continuous take; marks proof uploaded, advances to handover.
+  async uploadProof(orderId, fileName = 'proof.mp4') {
+    await delay(700)
+    const s = requireSession()
+    if (!s.user.perms?.media) throw new Error('لا تملك صلاحية رفع الوسائط')
+    const order = db.orders.find((o) => o.id === orderId)
+    if (!order) throw new Error('الطلب غير موجود')
+    order.proofStatus = 'مرفوع'
+    order.stage = 'handover'
+    order.labelCode = order.labelCode || `YAL-${Math.floor(1000 + Math.random() * 8999)}-AN`
+    logEvent('upload_proof', `${orderId} · ${fileName}`)
+    return clone(order)
+  },
+
+  // mark_handover — parcel handed to carrier (label code + "MT AUTO"), no address.
+  async markHandover(orderId) {
+    await delay(400)
+    requireSession()
+    const order = db.orders.find((o) => o.id === orderId)
+    if (!order) throw new Error('الطلب غير موجود')
+    if (!order.labelCode) throw new Error('لا يوجد رمز ملصق بعد')
+    order.status = 'قيد الشحن'
+    order.stage = 'transit'
+    order.tracking = ['تجهيز', 'استلمها الناقل']
+    logEvent('mark_handover', `${orderId} · ${order.labelCode}`)
+    return clone(order)
+  },
+
+  // reconfirm_offer — confirm availability+price on a re-selected frozen offer.
+  async reconfirmOffer(offerId, decision) {
+    await delay(300)
+    requireSession()
+    const offer = db.offers.find((o) => o.id === offerId)
+    if (offer) offer.status = decision === 'confirm' ? 'won' : 'lost'
+    logEvent('reconfirm_offer', `${offerId} · ${decision}`)
+    return { ok: true }
+  },
+
+  // Test/demo helper: force the R2 restricted state.
+  async _debugSetR2(active) {
+    db.shop.r2 = active
+      ? { active: true, reason: 'وضع تجريبي', since: new Date().toISOString() }
+      : { active: false, reason: '' }
+    return clone(db.shop)
+  },
+}
