@@ -122,7 +122,7 @@ page**, top to bottom: header with the FR/AR toggle · hero + example pricing ca
 · the نحن/أنت/10% navy band · كيف يعمل (01–04) · فريق المحل (employee invitations + team
 card) · سوق الجملة (قريباً + the parts-search-engine example) · sign-in (Google + email OTP)
 · contact (address / phone / directions + map-image drop placeholder) · navy "تابعنا" social
-footer. Notes: the FR side of the language toggle is visual-only until French content ships;
+footer. Notes: the FR side of the language toggle is disabled with a «قريباً» badge until French content ships;
 the map drop-area previews the image client-side only (nothing is uploaded).
 
 Remaining screens from the prototype, stubbed as «قيد الإنشاء» pages: team & permissions
