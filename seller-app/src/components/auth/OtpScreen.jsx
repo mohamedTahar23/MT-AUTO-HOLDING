@@ -1,14 +1,26 @@
-import { useRef, useState } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import { Ltr, Spinner } from '../ui/bits.jsx'
 
+// Seconds to wait before the "إعادة الإرسال" (resend) link becomes clickable.
+const RESEND_SECONDS = 30
+
 // 6-digit email OTP. Mock accepts any 6 digits (demo code: 123456).
-export default function OtpScreen({ email, onVerify, onChangeEmail }) {
+export default function OtpScreen({ email, onVerify, onResend, onChangeEmail }) {
   const [digits, setDigits] = useState(['', '', '', '', '', ''])
   const [err, setErr] = useState('')
   const [busy, setBusy] = useState(false)
+  const [secondsLeft, setSecondsLeft] = useState(RESEND_SECONDS)
+  const [resending, setResending] = useState(false)
   const refs = useRef([])
 
   const code = digits.join('')
+
+  // Tick the resend countdown down to zero, one second at a time.
+  useEffect(() => {
+    if (secondsLeft <= 0) return undefined
+    const id = setTimeout(() => setSecondsLeft((s) => s - 1), 1000)
+    return () => clearTimeout(id)
+  }, [secondsLeft])
 
   function setAt(i, v) {
     const d = v.replace(/\D/g, '').slice(-1)
@@ -40,6 +52,20 @@ export default function OtpScreen({ email, onVerify, onChangeEmail }) {
     } catch (e) {
       setErr(e.message === 'unknown-email' ? 'هذا البريد غير مسجّل.' : 'الرمز غير صحيح أو منتهي الصلاحية')
       setBusy(false)
+    }
+  }
+
+  async function resend() {
+    if (secondsLeft > 0 || resending) return
+    setResending(true)
+    setErr('')
+    try {
+      await onResend?.()
+      setDigits(['', '', '', '', '', ''])
+      refs.current[0]?.focus()
+      setSecondsLeft(RESEND_SECONDS)
+    } finally {
+      setResending(false)
     }
   }
 
@@ -82,10 +108,28 @@ export default function OtpScreen({ email, onVerify, onChangeEmail }) {
           disabled={busy || code.length !== 6}
           data-testid="verify"
         >
-          {busy ? <Spinner /> : 'تأكيد'}
+          {busy ? <Spinner /> : 'تأكيد ودخول'}
         </button>
 
         <p className="hint" style={{ marginTop: 14 }}>
+          {secondsLeft > 0 ? (
+            <span data-testid="resend-timer">
+              يمكنك إعادة الإرسال بعد <b>{secondsLeft}</b> ثانية
+            </span>
+          ) : (
+            <button
+              className="linklike"
+              onClick={resend}
+              disabled={resending}
+              style={btnLink}
+              data-testid="resend"
+            >
+              {resending ? '...' : 'إعادة الإرسال'}
+            </button>
+          )}
+        </p>
+
+        <p className="hint" style={{ marginTop: 6 }}>
           لم يصلك الرمز؟ تحقّق من مجلد الرسائل غير المرغوب فيها. <b>(تجريبي: 123456)</b>
         </p>
       </div>
