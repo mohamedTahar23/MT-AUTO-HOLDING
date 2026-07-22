@@ -59,6 +59,7 @@ export default function Sidebar({ counts, mode, setMode }) {
             key={i.name}
             className={`nav-item ${route.name === i.name ? 'active' : ''}`}
             onClick={() => navigate(i.name)}
+            data-testid={`nav-${i.name}`}
           >
             {i.label}
             {i.soon ? (
