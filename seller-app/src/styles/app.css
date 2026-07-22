@@ -2119,3 +2119,138 @@
   color: var(--amber-text);
   font-weight: 800;
 }
+
+/* ---------- Earnings: summary tiles + payout cards + receipt toggle ---------- */
+.pay-sums {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 16px;
+  margin-bottom: 22px;
+}
+@media (max-width: 860px) {
+  .pay-sums {
+    grid-template-columns: 1fr;
+  }
+}
+.pay-sum {
+  background: var(--card);
+  border: 1px solid var(--line);
+  border-radius: 14px;
+  padding: 18px;
+}
+.pay-sum .lbl {
+  font-size: 12px;
+  font-weight: 700;
+  color: var(--muted);
+}
+.pay-sum .n {
+  margin-top: 4px;
+  font-size: 26px;
+  font-weight: 800;
+  color: var(--navy-850);
+}
+.pay-sum.navy {
+  background: var(--navy-850);
+  border-color: var(--navy-850);
+}
+.pay-sum.navy .lbl {
+  color: #b9c6de; /* matches .tile.navy .lbl */
+}
+.pay-sum.navy .n {
+  color: #fff;
+}
+.pay-sum .dj,
+.pay-amount .dj {
+  font-size: 12px;
+  font-weight: 700;
+  color: var(--muted);
+}
+.pay-sum.navy .dj {
+  color: #b9c6de;
+}
+
+.pay-ref {
+  margin-top: 4px;
+  font-size: 12px;
+  color: var(--muted);
+}
+.pay-ref .lbl {
+  color: var(--faint);
+  font-weight: 700;
+  letter-spacing: 0.5px;
+}
+.pay-amount {
+  margin-top: 14px;
+  font-size: 24px;
+  font-weight: 800;
+  color: var(--navy-850);
+}
+.pay-date {
+  margin-top: 10px;
+  font-size: 11.5px;
+  color: var(--faint);
+}
+
+/* 3-step variant of the shipment tracker (line spans the 3 dot centers). */
+.dtrack.steps-3 {
+  margin-top: 16px;
+}
+.dtrack.steps-3 .dtrack-line {
+  inset-inline: 16.6%;
+}
+.dtrack.steps-3 .dcap {
+  font-size: 10px;
+}
+
+/* Receipt confirmation switch row: amber ask → green confirmed. */
+.pay-toggle {
+  width: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  margin-top: 12px;
+  padding: 11px 13px;
+  border-radius: 10px;
+  background: var(--amber-soft);
+  border: 1px solid var(--amber-line);
+  color: #8a5a1e; /* matches .strip-amber */
+  font-family: inherit;
+  font-size: 13px;
+  font-weight: 800;
+  text-align: start;
+  cursor: pointer;
+  transition: background 0.18s, border-color 0.18s, color 0.18s;
+}
+.pay-toggle.on {
+  background: var(--green-soft);
+  border-color: var(--green-line);
+  color: var(--green-text);
+  cursor: default;
+}
+.pay-track {
+  position: relative;
+  flex: none;
+  width: 44px;
+  height: 26px;
+  border-radius: var(--pill);
+  background: #d5dbe4; /* pending — matches .ddot */
+  transition: background 0.18s;
+}
+.pay-toggle.on .pay-track {
+  background: var(--green);
+}
+.pay-knob {
+  position: absolute;
+  top: 3px;
+  left: 3px;
+  width: 20px;
+  height: 20px;
+  border-radius: 50%;
+  background: #fff;
+  box-shadow: 0 1px 3px rgba(14, 32, 66, 0.3);
+  transition: left 0.18s;
+}
+.pay-toggle.on .pay-knob {
+  left: 21px;
+}

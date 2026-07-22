@@ -370,3 +370,70 @@ test('deliveries: dispute panel — staff sees the in-platform text, no link', a
   // Everything else is identical to the owner view — same tracker + pill.
   await expect(page.getByTestId('status-MT-4726')).toHaveText('قيد النزاع')
 })
+
+// ---- الأرباح (Earnings) -----------------------------------------------------
+
+async function openPayouts(page) {
+  await page.goto('/')
+  await page.getByPlaceholder('vendeur@mtauto.cloud').fill('owner@alamine-parts.dz')
+  await page.getByTestId('send-code').click()
+  for (let i = 0; i < 6; i++) await page.getByTestId(`otp-${i}`).fill('1')
+  await page.getByTestId('verify').click()
+  await expect(page.getByRole('heading', { name: 'طابور التسعير' })).toBeVisible()
+  await page.getByTestId('nav-payouts').click()
+  await expect(page.getByRole('heading', { name: 'الأرباح' })).toBeVisible()
+}
+
+test('earnings: totals, a pill of every kind, and no dispute rows', async ({ page }) => {
+  await openPayouts(page)
+
+  // Seed totals: pending = every non-dispute amount (nothing confirmed yet),
+  // received = the lifetime baseline.
+  await expect(page.getByTestId('pending-total')).toContainText('36 700')
+  await expect(page.getByTestId('received-total')).toContainText('494 700')
+
+  // Status → pill matrix (delivered/collected neutral, paid green).
+  const delivered = page.getByTestId('status-MT-4702')
+  await expect(delivered).toHaveText('بانتظار التحصيل')
+  await expect(delivered).toHaveClass(/pill-grey/)
+  await expect(page.getByTestId('status-MT-4695')).toHaveText('تم التحصيل')
+  const paid = page.getByTestId('status-MT-4676')
+  await expect(paid).toHaveText('مدفوع')
+  await expect(paid).toHaveClass(/pill-green/)
+
+  // The disputed order's money is frozen under التسليمات — never listed here.
+  await expect(page.getByTestId('payout-MT-4726')).toHaveCount(0)
+})
+
+test('earnings: tracker fill follows delivered → collected → paid', async ({ page }) => {
+  await openPayouts(page)
+
+  const fillPct = async (ref) => {
+    const style = await page.getByTestId(`payout-${ref}`).locator('.dtrack-fill').getAttribute('style')
+    return parseInt(style.match(/width:\s*(\d+)%/)[1], 10)
+  }
+  const widths = [await fillPct('MT-4702'), await fillPct('MT-4695'), await fillPct('MT-4676')]
+  expect(widths).toEqual([0, 50, 100])
+})
+
+test('earnings: confirming receipt flips the toggle and moves the amount', async ({ page }) => {
+  await openPayouts(page)
+
+  // Paid card starts unconfirmed → amber ask.
+  const toggle = page.getByTestId('receipt-toggle-MT-4676')
+  await expect(toggle).toContainText('أكّد استلام دفعتك')
+
+  // Click opens the receipt-confirm modal; confirming flips the switch.
+  await toggle.click()
+  await expect(page.getByTestId('receipt-modal')).toBeVisible()
+  await page.getByTestId('receipt-confirm').click()
+  await expect(toggle).toContainText('تم تأكيد الاستلام')
+  await expect(toggle).toHaveClass(/on/)
+
+  // 14 000 دج moved out of pending and into received — live, no reload.
+  await expect(page.getByTestId('pending-total')).toContainText('22 700')
+  await expect(page.getByTestId('received-total')).toContainText('508 700')
+
+  // Only the confirmed card flipped; the other paid cards still ask.
+  await expect(page.getByTestId('receipt-toggle-MT-4688')).toContainText('أكّد استلام دفعتك')
+})
