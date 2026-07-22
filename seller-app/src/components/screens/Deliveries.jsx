@@ -1,144 +1,103 @@
 import { useEffect, useState } from 'react'
 import { useApp } from '../../state/store.jsx'
-import { Ltr, Pill, Spinner } from '../ui/bits.jsx'
-import Stepper from '../ui/Stepper.jsx'
-import Modal from '../ui/Modal.jsx'
-import VideoModal from '../modals/VideoModal.jsx'
+import { Ltr } from '../ui/bits.jsx'
 import { api } from '../../api/index.js'
 
-const STEPS = ['تجهيز', 'استلمها الناقل', 'في الطريق', 'سُلّمت', 'مؤكَّد']
-const STAGE_INDEX = { video: -1, handover: 0, transit: 2, done: 3 }
-const STAGE_PILL = {
-  video: { tone: 'amber', label: 'بانتظار الإثبات' },
-  handover: { tone: 'amber', label: 'سلّم الطرد للناقل' },
-  transit: { tone: 'navy', label: 'في الطريق' },
-  done: { tone: 'green', label: 'سُلّمت' },
+// Tracking-only: handover is confirmed from the My Offers won row, not here.
+const STEP_ORDER = ['picked', 'transit', 'delivered', 'paid']
+const STEP_LABELS = ['تم تسليم القطعة لشركة الشحن', 'في الطريق', 'معاينة', 'دفع']
+const STATUS_PILL = {
+  pack: { tone: 'amber', label: 'بانتظار التسليم' },
+  picked: { tone: 'grey', label: 'سُلّمت للشركة' },
+  transit: { tone: 'grey', label: 'في الطريق' },
+  delivered: { tone: 'grey', label: 'في المعاينة' },
+  dispute: { tone: 'grey', label: 'قيد النزاع' },
+  paid: { tone: 'grey', label: 'مدفوع' },
 }
 
-export default function Deliveries({ onData }) {
-  const { toast } = useApp()
-  const [orders, setOrders] = useState(null)
-  const [videoOrder, setVideoOrder] = useState(null)
-  const [handoverOrder, setHandoverOrder] = useState(null)
+export default function Deliveries() {
+  const { isOwner } = useApp()
+  const [deliveries, setDeliveries] = useState(null)
 
-  async function load() {
-    setOrders(await api.getOrders())
-  }
   useEffect(() => {
-    load()
+    api.getDeliveries().then(setDeliveries)
   }, [])
 
-  if (orders === null) return <div className="card card-pad muted">جارٍ التحميل…</div>
+  if (deliveries === null) return <div className="card card-pad muted">جارٍ التحميل…</div>
 
   return (
     <>
       <h1 className="h1">التسليمات</h1>
-      <p className="sub">
-        تتبّع شحناتك بعد تأكيد الطلب — من تسليم الطرد لشركة التوصيل إلى المعاينة والدفع. لا تظهر أي عناوين —
-        الطرد يحمل رمز الملصق وعبارة «MT AUTO» فقط.
+      <p className="sub" style={{ fontSize: 13.5 }}>
+        تتبّع شحناتك بعد تأكيد الطلب — من تسليم الطرد لشركة التوصيل إلى المعاينة والدفع.
       </p>
 
-      <div className="cards-grid" style={{ marginTop: 16 }}>
-        {orders.map((o) => {
-          const pill = STAGE_PILL[o.stage] || STAGE_PILL.transit
-          return (
-            <div className="card card-pad" key={o.id}>
-              <div className="row between center">
-                <b>{o.partName}</b>
-                <Pill tone={pill.tone} dot>
-                  {pill.label}
-                </Pill>
-              </div>
-              <div className="faint" style={{ fontSize: 12.5, marginTop: 2 }}>
-                {o.car}
-              </div>
-              <div style={{ marginTop: 8 }}>
-                <span className="ref-chip">
-                  <span className="ref-lbl">الكود</span>
-                  <Ltr mono>{o.labelCode || o.id}</Ltr>
-                </span>
-              </div>
-
-              <Stepper steps={STEPS} current={STAGE_INDEX[o.stage]} />
-
-              {o.stage === 'video' && (
-                <>
-                  <div className="strip strip-amber" style={{ marginTop: 8, fontSize: 12.5 }}>
-                    صوّر القطعة وتغليفها في فيديو واحد متواصل قبل الشحن.
-                  </div>
-                  <button className="btn btn-primary btn-block" style={{ marginTop: 10 }} onClick={() => setVideoOrder(o)}>
-                    صوّر القطعة
-                  </button>
-                </>
-              )}
-
-              {o.stage === 'handover' && (
-                <>
-                  <div className="strip strip-navy" style={{ marginTop: 8, fontSize: 12.5 }}>
-                    سلّم الطرد للناقل مع ذكر الرمز <Ltr mono>{o.labelCode}</Ltr> وعبارة «MT AUTO». لا تكتب أي
-                    عنوان على الطرد.
-                  </div>
-                  <button className="btn btn-primary btn-block" style={{ marginTop: 10 }} onClick={() => setHandoverOrder(o)}>
-                    سلّمت الطرد للناقل
-                  </button>
-                </>
-              )}
-            </div>
-          )
-        })}
+      <div className="dl-masonry">
+        {deliveries.map((o) => (
+          <DeliveryCard key={o.id} order={o} isOwner={isOwner} />
+        ))}
       </div>
-
-      {videoOrder && (
-        <VideoModal order={videoOrder} onClose={() => setVideoOrder(null)} onDone={() => (load(), onData?.())} />
-      )}
-      {handoverOrder && (
-        <HandoverModal
-          order={handoverOrder}
-          onClose={() => setHandoverOrder(null)}
-          onDone={() => {
-            load()
-            onData?.()
-            toast('تم تسجيل تسليم الطرد للناقل.', 'ok')
-          }}
-        />
-      )}
     </>
   )
 }
 
-function HandoverModal({ order, onClose, onDone }) {
-  const [ack, setAck] = useState(false)
-  const [busy, setBusy] = useState(false)
-  async function confirm() {
-    setBusy(true)
-    try {
-      await api.markHandover(order.id)
-      onDone?.()
-      onClose()
-    } finally {
-      setBusy(false)
-    }
-  }
+function DeliveryCard({ order: o, isOwner }) {
+  const s = o.deliveryStatus
+  const pill = STATUS_PILL[s] || STATUS_PILL.pack
+  const idx = s === 'dispute' ? STEP_ORDER.indexOf('delivered') : STEP_ORDER.indexOf(s)
+  const pct = idx <= 0 ? '0%' : Math.round((idx / 3) * 100) + '%'
+
   return (
-    <Modal
-      onClose={onClose}
-      maxWidth={460}
-      tag="خطوة أخيرة"
-      title="تأكيد تسليم الطرد"
-      sub="القطعة التي تشحنها الآن هي نفسها التي ظهرت في الفيديو، ويعاينها المشتري عند الاستلام."
-      footer={
-        <button className="btn btn-primary btn-block" onClick={confirm} disabled={busy || !ack}>
-          {busy ? <Spinner /> : 'أؤكد تسليم القطعة لشركة الشحن'}
-        </button>
-      }
-    >
-      <div className="strip strip-navy" style={{ marginBottom: 12 }}>
-        الرمز على الطرد: <Ltr mono>{order.labelCode}</Ltr> · وعبارة «MT AUTO».
+    <div className="card card-pad" data-testid={`delivery-${o.id}`}>
+      <div className="row between" style={{ alignItems: 'flex-start' }}>
+        <div>
+          <b style={{ color: 'var(--navy-850)', fontSize: 15, fontWeight: 700 }}>
+            {o.partName} · {o.car}
+          </b>
+          <div style={{ marginTop: 6 }}>
+            <span className="ref-chip">
+              <span className="ref-lbl">الكود</span>
+              <Ltr mono>{o.labelCode || o.id}</Ltr>
+            </span>
+          </div>
+        </div>
+        <span className={`pill pill-${pill.tone}`} data-testid={`status-${o.id}`}>
+          {pill.label}
+        </span>
       </div>
-      <label className="check">
-        <input type="checkbox" checked={ack} onChange={(e) => setAck(e.target.checked)} />
-        أؤكّد أنني سلّمت نفس القطعة التي صوّرتها سابقاً.
-      </label>
-    </Modal>
+
+      <div className="dtrack" dir="ltr">
+        <span className="dtrack-line">
+          <span className="dtrack-fill" style={{ width: pct }} />
+        </span>
+        {STEP_LABELS.map((cap, i) => (
+          <span className="dstep" key={cap}>
+            <span className={'ddot' + (i <= idx ? ' on' : '')} />
+            <span className={'dcap' + (i <= idx ? ' on' : '')}>{cap}</span>
+          </span>
+        ))}
+      </div>
+
+      {s === 'dispute' && (
+        <div className="dispute-note" data-testid={`dispute-${o.id}`}>
+          {isOwner ? (
+            <>
+              النزاع يُحلّ عبر واتساب — الفيديو الذي ارسلته هو المرجع.{' '}
+              <a
+                className="dispute-wa"
+                data-testid={`dispute-wa-${o.id}`}
+                href="https://wa.me/213659401338"
+                target="_blank"
+                rel="noreferrer"
+              >
+                ✆ متابعة النزاع عبر واتساب
+              </a>
+            </>
+          ) : (
+            <>القطعة في نزاع — يُحلّ النزاع داخل المنصة. الفيديو الذي أرسلته عبر المنصة هو المرجع.</>
+          )}
+        </div>
+      )}
+    </div>
   )
 }
