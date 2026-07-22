@@ -132,10 +132,14 @@ const STEPS = [
   { title: 'الدفع عند الاستلام', text: 'تدفع نقداً عند استلام البضاعة في محلك.' },
 ]
 
-/** Normalize a query/ref for matching: uppercase, no spaces/dashes/dots. */
+/** Normalize a query/ref for matching: uppercase, no spaces/dashes/dots,
+ *  Arabic-Indic digits (٠-٩ / ۰-۹) mapped to Western so an Arabic keyboard
+ *  layout still matches the Latin refs. */
 const norm = (s) =>
   String(s || '')
     .toUpperCase()
+    .replace(/[٠-٩]/g, (d) => String(d.charCodeAt(0) - 0x0660))
+    .replace(/[۰-۹]/g, (d) => String(d.charCodeAt(0) - 0x06f0))
     .replace(/[\s\-–—_.]/g, '')
 
 /** Find the demo part matching a query by ref, alias, part name or vehicle. */
