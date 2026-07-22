@@ -511,14 +511,16 @@ test('buy search: vehicle-name hit, and a nonsense query shows the no-match stat
   await page.getByTestId('buy-search-btn').click()
   await expect(page.getByTestId('buy-result')).toContainText('Tendeur de chaîne')
 
-  // By the short marketing abbreviation (Enter submits too).
-  await input.fill('TEN CH SPO')
-  await input.press('Enter')
-  await expect(page.getByTestId('buy-result')).toContainText('Mobis')
-
   // Nonsense → the muted no-match state replaces the result card.
   await input.fill('XYZ-0000')
   await page.getByTestId('buy-search-btn').click()
   await expect(page.getByTestId('buy-result')).toHaveCount(0)
   await expect(page.getByTestId('buy-result-empty')).toContainText('لا نتائج')
+
+  // From the empty state, the short marketing abbreviation + Enter must
+  // re-create the card — proving the Enter submit path actually searches.
+  await input.fill('TEN CH SPO')
+  await input.press('Enter')
+  await expect(page.getByTestId('buy-result')).toContainText('Mobis')
+  await expect(page.getByTestId('buy-result-empty')).toHaveCount(0)
 })
