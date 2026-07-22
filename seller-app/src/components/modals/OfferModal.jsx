@@ -10,11 +10,14 @@ const EMPTY = { price: '', brand: '', country: '', countryOther: '', note: '', p
 
 // Offer / quote modal. Supports multi-brand: each brand is a separate competing
 // offer on the same request. Validation mirrors submit_offer (3–7 digit price,
-// brand + country required, note ≤240, commitment required).
+// brand + country required, note ≤240, commitment required). After a submit it
+// shows a "what happens next" confirmation with add-another / close.
 export default function OfferModal({ task, onClose, onSubmitted }) {
   const { toast } = useApp()
   const [f, setF] = useState(EMPTY)
   const [sessionOffers, setSessionOffers] = useState([]) // brands priced this session
+  const [showPartNo, setShowPartNo] = useState(false)
+  const [sent, setSent] = useState(false)
   const [busy, setBusy] = useState(false)
 
   const set = (k, v) => setF((p) => ({ ...p, [k]: v }))
@@ -43,11 +46,10 @@ export default function OfferModal({ task, onClose, onSubmitted }) {
       setSessionOffers((s) => [...s, { brand: offer.brand, price: offer.price }])
       onSubmitted?.()
       if (another) {
-        toast('سُجّل عرضك — أضف الآن علامة أخرى لنفس القطعة.', 'ok')
-        setF(EMPTY)
+        toast('سُجّل عرضك — أضف الآن ماركة أخرى لنفس القطعة.', 'ok')
+        resetForm()
       } else {
-        toast('أُرسل عرضك.', 'ok')
-        onClose()
+        setSent(true) // show the confirmation / "what happens next" step
       }
     } catch (e) {
       toast(e.message, 'err')
@@ -56,8 +58,84 @@ export default function OfferModal({ task, onClose, onSubmitted }) {
     }
   }
 
+  function resetForm() {
+    setF(EMPTY)
+    setShowPartNo(false)
+  }
+  function addAnother() {
+    resetForm()
+    setSent(false)
+  }
+
   const net = f.price ? netEarnings(f.price) : 0
 
+  // ---- Confirmation ("what happens next") ---------------------------------
+  if (sent) {
+    return (
+      <Modal
+        testid="offer-modal"
+        onClose={onClose}
+        tag="تم الإرسال"
+        title="تم إرسال عرضك"
+        maxWidth={520}
+        footer={
+          <>
+            <button className="btn btn-ghost grow" onClick={addAnother} data-testid="offer-add-another">
+              إضافة عرض آخر
+            </button>
+            <button className="btn btn-primary grow" onClick={onClose} data-testid="offer-done">
+              تم، إغلاق
+            </button>
+          </>
+        }
+      >
+        <div style={{ textAlign: 'center', marginBottom: 8 }}>
+          <div style={{ fontSize: 42, lineHeight: 1 }}>✅</div>
+          <p className="sub" style={{ marginTop: 6 }}>
+            وصل عرضك إلى المشتري. سنُعلمك فور اختياره — ويمكنك تسعير ماركة أخرى لنفس الطلب.
+          </p>
+        </div>
+
+        {sessionOffers.length > 0 && (
+          <div className="strip strip-navy" style={{ marginBottom: 14 }}>
+            <b>عروضك على هذا الطلب:</b>{' '}
+            {sessionOffers.map((s, i) => (
+              <span className="pill pill-grey" key={i} style={{ marginInlineEnd: 6 }}>
+                {s.brand} · <Ltr mono>{money(s.price)}</Ltr>
+              </span>
+            ))}
+          </div>
+        )}
+
+        <div style={{ fontSize: 13, fontWeight: 800, color: 'var(--faint)', marginBottom: 10 }}>ما الذي يحدث الآن؟</div>
+        <div className="commit">
+          <div className="item">
+            <span className="ico">🔎</span>
+            <div>
+              <b>يقارن المشتري العروض</b>
+              <div className="faint" style={{ fontSize: 12.5 }}>يختار المشتري أفضل عرض من حيث السعر والماركة والتقييم.</div>
+            </div>
+          </div>
+          <div className="item">
+            <span className="ico">🎬</span>
+            <div>
+              <b>عند فوز عرضك تُصوّر القطعة</b>
+              <div className="faint" style={{ fontSize: 12.5 }}>فيديو واحد متواصل (القطعة ثم التغليف) قبل الشحن لتأكيد الالتزام.</div>
+            </div>
+          </div>
+          <div className="item">
+            <span className="ico">🚚</span>
+            <div>
+              <b>الشحن عبر MT AUTO</b>
+              <div className="faint" style={{ fontSize: 12.5 }}>تُسلّم الطرد للناقل، ويُحرَّر مستحقّك بعد تأكيد التسليم.</div>
+            </div>
+          </div>
+        </div>
+      </Modal>
+    )
+  }
+
+  // ---- Offer form ---------------------------------------------------------
   return (
     <Modal
       testid="offer-modal"
@@ -162,6 +240,31 @@ export default function OfferModal({ task, onClose, onSubmitted }) {
             placeholder="اكتب اسم بلد الصنع"
             value={f.countryOther}
             onChange={(e) => set('countryOther', e.target.value)}
+          />
+        )}
+      </div>
+
+      {/* optional part number */}
+      <div className="field">
+        <label className="check" style={{ marginBottom: showPartNo ? 8 : 0 }}>
+          <input
+            type="checkbox"
+            checked={showPartNo}
+            onChange={(e) => {
+              setShowPartNo(e.target.checked)
+              if (!e.target.checked) set('partNo', '')
+            }}
+            data-testid="offer-partno-toggle"
+          />
+          أضف رقم القطعة (OEM) — اختياري
+        </label>
+        {showPartNo && (
+          <input
+            className="input ltr"
+            placeholder="مثال: 03L 121 011 P"
+            value={f.partNo}
+            onChange={(e) => set('partNo', e.target.value)}
+            data-testid="offer-partno"
           />
         )}
       </div>

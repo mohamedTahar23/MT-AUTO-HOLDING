@@ -87,7 +87,7 @@ test('sign in → pricing queue → submit an offer', async ({ page }) => {
 
   // Land on the queue.
   await expect(page.getByRole('heading', { name: 'طابور التسعير' })).toBeVisible()
-  await expect(page.getByText('MT-10482')).toBeVisible()
+  await expect(page.getByTestId('quote-MT-10482')).toBeVisible()
 
   // Open the offer modal for the first task and submit a valid offer.
   await page.getByTestId('quote-MT-10482').click()
@@ -99,7 +99,9 @@ test('sign in → pricing queue → submit an offer', async ({ page }) => {
   await page.getByTestId('offer-agree').check()
   await page.getByTestId('offer-submit').click()
 
-  // Modal closes and the queue button flips to "submitted".
+  // Submit shows the "what happens next" confirmation; closing it flips the card.
+  await expect(page.getByRole('heading', { name: 'تم إرسال عرضك' })).toBeVisible()
+  await page.getByTestId('offer-done').click()
   await expect(modal).toBeHidden()
   await expect(page.getByTestId('quote-MT-10482')).toContainText('تم تقديم عرضك')
 })
@@ -160,4 +162,43 @@ test('offer submit stays disabled until price/brand/country/agreement are valid'
   await expect(submit).toBeDisabled() // still needs the commitment checkbox
   await page.getByTestId('offer-agree').check()
   await expect(submit).toBeEnabled()
+})
+
+test('brand filter narrows the queue and can empty it', async ({ page }) => {
+  await page.goto('/')
+  await page.getByPlaceholder('vendeur@mtauto.cloud').fill('owner@alamine-parts.dz')
+  await page.getByTestId('send-code').click()
+  for (let i = 0; i < 6; i++) await page.getByTestId(`otp-${i}`).fill('1')
+  await page.getByTestId('verify').click()
+  await expect(page.getByRole('heading', { name: 'طابور التسعير' })).toBeVisible()
+
+  // No filter → the Volkswagen (German) request is present.
+  await expect(page.getByTestId('quote-MT-10482')).toBeVisible()
+
+  // Filter to Renault → only the Renault request remains in the grid.
+  await page.getByTestId('brand-filter').click()
+  await page.getByTestId('brand-opt-Renault').click()
+  await expect(page.getByTestId('brand-filter-count')).toHaveText('1')
+  await expect(page.getByTestId('quote-MT-10495')).toBeVisible()
+  await expect(page.getByTestId('quote-MT-10482')).toHaveCount(0)
+
+  // Clear → all requests return.
+  await page.getByTestId('brand-filter-clear').click()
+  await expect(page.getByTestId('quote-MT-10482')).toBeVisible()
+
+  // A brand with no open requests → filter-specific empty state.
+  await page.getByTestId('brand-opt-Toyota').click()
+  await expect(page.getByTestId('queue-empty')).toBeVisible()
+})
+
+test('queue shows the sponsored right rail', async ({ page }) => {
+  await page.goto('/')
+  await page.getByPlaceholder('vendeur@mtauto.cloud').fill('owner@alamine-parts.dz')
+  await page.getByTestId('send-code').click()
+  for (let i = 0; i < 6; i++) await page.getByTestId(`otp-${i}`).fill('1')
+  await page.getByTestId('verify').click()
+  await expect(page.getByRole('heading', { name: 'طابور التسعير' })).toBeVisible()
+
+  await expect(page.locator('.rail-spon')).toHaveText('مموّل')
+  await expect(page.getByTestId('ad-carousel')).toBeVisible()
 })
