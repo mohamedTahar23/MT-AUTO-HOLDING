@@ -11,6 +11,14 @@ const now = Date.now()
 const mins = (m) => new Date(now - m * 60000).toISOString()
 const fromNow = (m) => new Date(now + m * 60000).toISOString()
 
+// Tiny inline SVG thumbnail standing in for a buyer-uploaded part photo — no
+// external assets, so the mock stays self-contained and CSP-safe.
+const photoThumb = (bg) =>
+  'data:image/svg+xml,' +
+  encodeURIComponent(
+    `<svg xmlns="http://www.w3.org/2000/svg" width="96" height="96"><rect width="96" height="96" fill="${bg}"/><circle cx="48" cy="48" r="22" fill="none" stroke="#FF8A1F" stroke-width="7"/><circle cx="48" cy="48" r="7" fill="#FF8A1F"/></svg>`,
+  )
+
 // The signed-in shop (organization). r2.active gates the whole portal.
 export const shop = {
   id: 'shop_annaba_01',
@@ -57,14 +65,17 @@ export const knownAccounts = {
 }
 
 // seller_task_v — anonymised pricing tasks (the queue). ZERO buyer identity.
+// `brandAlt` (optional) names an accepted substitute brand; `buyerPhotoUrl` is a
+// masked reference photo the buyer attached (blank when none).
 export const tasks = [
   {
     id: 'MT-10482',
     createdAt: mins(7),
     part: { name: 'مضخة ماء', ref: 'RAF-2231' },
     car: { make: 'Volkswagen', model: 'Golf 7', year: 2016, engine: '1.6 TDI' },
-    buyerPhotoUrl: '',
+    buyerPhotoUrl: photoThumb('#0E2042'),
     prefBrand: 'Hepu',
+    brandAlt: 'Gates',
     altOk: true,
     note: 'القطعة الأصلية بها تسريب، أريد بديلاً موثوقاً.',
     competingShops: 3,
@@ -76,6 +87,7 @@ export const tasks = [
     car: { make: 'Peugeot', model: '308', year: 2014, engine: '1.6 HDi' },
     buyerPhotoUrl: '',
     prefBrand: 'Bosch',
+    brandAlt: 'TRW',
     altOk: true,
     note: '',
     competingShops: 5,
@@ -87,7 +99,7 @@ export const tasks = [
     car: { make: 'Renault', model: 'Clio 4', year: 2018, engine: '1.5 dCi' },
     buyerPhotoUrl: '',
     prefBrand: 'Valeo',
-    altOk: false,
+    altOk: false, // أصلي فقط — no substitute accepted
     note: 'أصلي فقط، بدون بدائل.',
     competingShops: 2,
   },
@@ -98,14 +110,66 @@ export const tasks = [
     car: { make: 'Hyundai', model: 'i30', year: 2015, engine: '1.4' },
     buyerPhotoUrl: '',
     prefBrand: 'Monroe',
+    brandAlt: 'KYB',
     altOk: true,
     note: '',
     competingShops: 4,
   },
+  {
+    id: 'MT-10506',
+    createdAt: mins(96),
+    part: { name: 'طقم قابض', ref: 'RAF-3382' },
+    car: { make: 'Citroën', model: 'C4', year: 2017, engine: '1.6 HDi' },
+    buyerPhotoUrl: '',
+    prefBrand: 'Valeo',
+    brandAlt: 'Sachs',
+    altOk: true,
+    note: 'يفضّل طقم كامل مع رمان بلي القابض.',
+    competingShops: 6,
+  },
+  {
+    id: 'MT-10510',
+    createdAt: mins(120),
+    part: { name: 'بطارية 60 أمبير', ref: 'RAF-6605' },
+    car: { make: 'Kia', model: 'Sportage', year: 2019, engine: '1.6 GDI' },
+    buyerPhotoUrl: photoThumb('#143058'),
+    prefBrand: 'Varta',
+    brandAlt: 'Bosch',
+    altOk: true,
+    note: 'السيارة متوقّفة — أحتاجها اليوم إن أمكن.',
+    competingShops: 3,
+  },
+  {
+    id: 'MT-10515',
+    createdAt: mins(150),
+    part: { name: 'ذراع مساحات أمامي', ref: 'RAF-7742' },
+    car: { make: 'Nissan', model: 'Qashqai', year: 2016, engine: '1.5 dCi' },
+    buyerPhotoUrl: '',
+    prefBrand: 'Bosch',
+    brandAlt: 'Valeo',
+    altOk: true,
+    note: '',
+    competingShops: 5,
+  },
 ]
 
 // My offers. `sent` offers within 15 min can be withdrawn free.
+// of_q1 targets a task still in the open queue → that card shows as already priced.
 export const offers = [
+  {
+    id: 'of_q1',
+    taskId: 'MT-10501',
+    partName: 'مساعد أمامي',
+    car: 'Hyundai i30 2015',
+    price: 5200,
+    brand: 'Monroe',
+    country: 'فرنسا',
+    note: '',
+    status: 'sent',
+    submittedAt: mins(12),
+    actedBy: 'u_owner',
+    competingShops: 4,
+  },
   {
     id: 'of_1',
     taskId: 'MT-10470',
@@ -272,6 +336,47 @@ export const brandChips = [
   'Volkswagen', 'Citroën', 'Peugeot', 'Renault', 'Toyota', 'Kia', 'Hyundai',
   'Fiat', 'Seat', 'Škoda', 'Ford', 'Chevrolet', 'Dacia', 'Suzuki', 'Nissan',
   'Mercedes', 'قطع عامة', 'سيارات صينية',
+]
+
+// Car makes grouped by origin — powers the queue's "تصفية حسب الماركة" filter.
+// `brands` values must match task.car.make exactly for filtering to work.
+export const carBrandGroups = [
+  { country: 'فرنسية', brands: ['Renault', 'Dacia', 'Peugeot', 'Citroën', 'DS'] },
+  { country: 'كورية', brands: ['Hyundai', 'Kia'] },
+  { country: 'ألمانية', brands: ['Volkswagen', 'Audi', 'BMW', 'Mercedes', 'Opel', 'Seat'] },
+  { country: 'يابانية', brands: ['Toyota', 'Nissan', 'Honda', 'Mazda', 'Suzuki'] },
+]
+
+// Sponsored slides for the queue right-rail ad carousel (مموّل). No external
+// assets — the card art is a CSS gradient keyed off `hue`.
+export const ads = [
+  {
+    id: 'ad1',
+    brand: 'MANN-FILTER',
+    eyebrow: 'شريك موثوق',
+    title: 'فلاتر أصلية بسعر الجملة',
+    sub: 'زيت · هواء · وقود — تغطية كاملة للسيارات الأوروبية',
+    cta: 'اكتشف العرض',
+    hue: '#0E2042',
+  },
+  {
+    id: 'ad2',
+    brand: 'VALEO',
+    eyebrow: 'عرض هذا الأسبوع',
+    title: 'أطقم قوابض بضمان سنتين',
+    sub: 'خصم يصل إلى 15% للبائعين المعتمدين',
+    cta: 'اطلب الكتالوج',
+    hue: '#143058',
+  },
+  {
+    id: 'ad3',
+    brand: 'BOSCH',
+    eyebrow: 'وصل حديثاً',
+    title: 'بطاريات وشمعات إشعال',
+    sub: 'توصيل سريع لعنابة والشرق الجزائري',
+    cta: 'تواصل الآن',
+    hue: '#1D3F73',
+  },
 ]
 
 // Wilaya list for enrollment (subset of the 58 — enough for the picker).

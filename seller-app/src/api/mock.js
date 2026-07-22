@@ -132,7 +132,8 @@ export const mockApi = {
   async getTasks() {
     await delay()
     requireSession()
-    if (db.shop.r2.active) return [] // blocked server-side while restricted
+    // Tasks stay visible while restricted (R2): the queue renders each card's
+    // action as "التسعير موقوف" and submitOffer still refuses server-side.
     return clone(db.tasks)
   },
   async getOffers() {
@@ -170,8 +171,12 @@ export const mockApi = {
     await delay(120)
     return clone(seed.announcements)
   },
+  async getAds() {
+    await delay(120)
+    return clone(seed.ads)
+  },
   getMeta() {
-    return { countries: seed.countries, brandChips: seed.brandChips, wilayas: seed.wilayas }
+    return { countries: seed.countries, brandChips: seed.brandChips, wilayas: seed.wilayas, carBrandGroups: seed.carBrandGroups }
   },
 
   // ---- RPC mutations ------------------------------------------------------
