@@ -1900,3 +1900,145 @@
   color: var(--faint);
   font-size: 11.5px;
 }
+
+/* ============================================================================
+   My Offers (عروضي) — grouped offers table, brand chips, deliver toggle,
+   per-offer summary strips. Tokens only.
+   ========================================================================== */
+
+/* Outlined-navy brand chip (unlike .pill-navy, which is a solid fill). */
+.chip-brand {
+  display: inline-flex;
+  align-items: center;
+  padding: 4px 12px;
+  border: 1.5px solid var(--navy-850);
+  border-radius: 8px;
+  background: var(--card);
+  color: var(--navy-850);
+  font-size: 13px;
+  font-weight: 800;
+}
+
+/* Prep/deliver toggle: muted off-state ⇄ amber on-state. */
+.deliver-toggle {
+  min-height: 36px;
+  padding: 6px 14px;
+  border: 1px solid var(--line);
+  border-radius: var(--pill);
+  background: var(--card);
+  color: var(--muted);
+  font-family: inherit;
+  font-size: 13px;
+  font-weight: 800;
+  cursor: pointer;
+  transition: background 0.15s, color 0.15s, border-color 0.15s;
+  white-space: nowrap;
+}
+.deliver-toggle.on {
+  background: var(--amber);
+  border-color: var(--amber);
+  color: var(--navy-900);
+}
+
+/* Flex "table" — column header, group bands, offer rows. */
+.ot-head,
+.ot-row,
+.ot-group-head {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 10px 16px;
+}
+.ot-head {
+  color: var(--faint);
+  font-size: 11px;
+  font-weight: 800;
+  border-bottom: 1px solid var(--line);
+}
+.ot-group {
+  border-bottom: 1px solid var(--line);
+}
+.ot-group:last-child {
+  border-bottom: 0;
+}
+.ot-group-head {
+  flex-wrap: wrap;
+  row-gap: 6px;
+  background: var(--line-2);
+  border-bottom: 1px solid var(--line-2);
+}
+.ot-group-head .ot-part {
+  color: var(--navy-850);
+  font-size: 14px;
+}
+.ot-group-head .ot-car {
+  color: var(--muted);
+  font-size: 12px;
+}
+.ot-addbrand {
+  border: 1.5px dashed var(--amber-line);
+  border-radius: var(--pill);
+  background: transparent;
+  color: var(--amber-text);
+  font-family: inherit;
+  font-size: 12px;
+  font-weight: 800;
+  padding: 5px 12px;
+  cursor: pointer;
+}
+.ot-addbrand:hover {
+  background: var(--amber-soft);
+}
+.ot-row {
+  flex-wrap: wrap;
+  row-gap: 8px;
+}
+.ot-c1 {
+  flex: 1 1 0;
+  min-width: 140px;
+}
+.ot-c2 {
+  flex: 0 0 150px;
+}
+.ot-c3 {
+  flex: 0 0 120px;
+  font-size: 14px;
+}
+.ot-c4 {
+  flex: 0 0 150px;
+}
+.ot-c5 {
+  flex: 0 0 120px;
+  display: flex;
+  justify-content: flex-end;
+}
+@media (max-width: 760px) {
+  .ot-head {
+    display: none;
+  }
+  .ot-c2,
+  .ot-c3,
+  .ot-c4,
+  .ot-c5 {
+    flex: 0 0 auto;
+  }
+}
+
+/* Subtle per-offer summary strip (sits directly under its offer row). */
+.offer-summary {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 12px;
+  margin: 0 16px 12px;
+  padding: 8px 12px;
+  background: var(--bg);
+  border: 1px solid var(--line-2);
+  border-radius: var(--r-sm);
+  color: var(--muted);
+  font-size: 12px;
+}
+.offer-summary .os-net {
+  color: var(--navy-850);
+  font-weight: 800;
+}

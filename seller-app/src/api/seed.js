@@ -154,19 +154,37 @@ export const tasks = [
 ]
 
 // My offers. `sent` offers within 15 min can be withdrawn free.
-// of_q1 targets a task still in the open queue → that card shows as already priced.
+// of_q1/of_q2 both target MT-10501 (still in the open queue) → a 2-offer group
+// on the عروضي screen. `ref` is the part reference shown in the offers table
+// (may be empty when the seller didn't record one).
 export const offers = [
   {
     id: 'of_q1',
     taskId: 'MT-10501',
     partName: 'مساعد أمامي',
     car: 'Hyundai i30 2015',
+    ref: 'RAF-1120',
     price: 5200,
     brand: 'Monroe',
     country: 'فرنسا',
     note: '',
     status: 'sent',
-    submittedAt: mins(12),
+    submittedAt: mins(12), // inside the 15-min window → free withdraw
+    actedBy: 'u_owner',
+    competingShops: 4,
+  },
+  {
+    id: 'of_q2',
+    taskId: 'MT-10501',
+    partName: 'مساعد أمامي',
+    car: 'Hyundai i30 2015',
+    ref: 'RAF-1120',
+    price: 4700,
+    brand: 'KYB',
+    country: 'اليابان',
+    note: '',
+    status: 'sent',
+    submittedAt: mins(45), // window closed → withdrawal now warns
     actedBy: 'u_owner',
     competingShops: 4,
   },
@@ -175,6 +193,7 @@ export const offers = [
     taskId: 'MT-10470',
     partName: 'فلتر زيت',
     car: 'Toyota Corolla 2017',
+    ref: 'RAF-9954',
     price: 1800,
     brand: 'Denso',
     country: 'اليابان',
@@ -189,6 +208,7 @@ export const offers = [
     taskId: 'MT-10465',
     partName: 'طرمبة بنزين',
     car: 'Seat Ibiza 2013',
+    ref: '', // no reference recorded — table shows an empty cell
     price: 6400,
     brand: 'Pierburg',
     country: 'ألمانيا',
@@ -203,14 +223,45 @@ export const offers = [
     taskId: 'MT-10459',
     partName: 'قرص دبرياج',
     car: 'Dacia Logan 2016',
+    ref: 'RAF-5531',
     price: 9200,
     brand: 'Valeo',
     country: 'فرنسا',
     note: '',
-    status: 'won',
+    status: 'won', // its order (MT-10459) still awaits the proof video → "مطلوب فيديو"
     submittedAt: mins(280),
     actedBy: 'u_owner',
     competingShops: 3,
+  },
+  {
+    id: 'of_won2',
+    taskId: 'MT-10430',
+    partName: 'رادياتير مكيّف',
+    car: 'BMW Série 3 2018',
+    ref: 'RAF-7810',
+    price: 62000, // > 50 000 دج → 6% commission tier
+    brand: 'Mahle',
+    country: 'ألمانيا',
+    note: '',
+    status: 'won', // video already accepted → confirmed, preparing shipment
+    submittedAt: mins(320),
+    actedBy: 'u_owner',
+    competingShops: 5,
+  },
+  {
+    id: 'of_lost',
+    taskId: 'MT-10412',
+    partName: 'مقصّ أمامي',
+    car: 'Peugeot 208 2015',
+    ref: '',
+    price: 4800,
+    brand: 'TRW',
+    country: 'فرنسا',
+    note: '',
+    status: 'lost',
+    submittedAt: mins(2000),
+    actedBy: 'u_emp_1',
+    competingShops: 7,
   },
 ]
 

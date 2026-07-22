@@ -202,3 +202,106 @@ test('queue shows the sponsored right rail', async ({ page }) => {
   await expect(page.locator('.rail-spon')).toHaveText('مموّل')
   await expect(page.getByTestId('ad-carousel')).toBeVisible()
 })
+
+// ---- عروضي (My Offers) ------------------------------------------------------
+
+async function openMyOffers(page) {
+  await page.goto('/')
+  await page.getByPlaceholder('vendeur@mtauto.cloud').fill('owner@alamine-parts.dz')
+  await page.getByTestId('send-code').click()
+  for (let i = 0; i < 6; i++) await page.getByTestId(`otp-${i}`).fill('1')
+  await page.getByTestId('verify').click()
+  await expect(page.getByRole('heading', { name: 'طابور التسعير' })).toBeVisible()
+  await page.getByTestId('nav-quotes').click()
+  await expect(page.getByRole('heading', { name: 'عروضي' })).toBeVisible()
+}
+
+test('my offers: won banner, stat tiles, grouped table and status badges', async ({ page }) => {
+  await openMyOffers(page)
+
+  // Won banner shows the confirmed (video-done) offer with its net receipt.
+  const banner = page.getByTestId('won-banner')
+  await expect(banner).toBeVisible()
+  await expect(banner).toContainText('تم تأكيد الطلب')
+  await expect(banner).toContainText('رادياتير مكيّف')
+
+  // Tiles derive from the same offers list: 1 video / 4 review / 1 won.
+  await expect(page.getByTestId('stat-video')).toContainText('1')
+  await expect(page.getByTestId('stat-review')).toContainText('4')
+  await expect(page.getByTestId('stat-won')).toContainText('1')
+
+  // Two brand-offers on MT-10501 → group count pill + add-brand affordance.
+  await expect(page.getByTestId('group-count-MT-10501')).toHaveText('عرضان')
+  await expect(page.getByTestId('add-brand-MT-10501')).toBeVisible()
+
+  // Status → badge/action matrix.
+  await expect(page.getByTestId('status-of_3')).toContainText('مطلوب فيديو')
+  await expect(page.getByTestId('film-of_3')).toBeVisible() // amber film CTA
+  await expect(page.getByTestId('status-of_q1')).toContainText('قيد المراجعة')
+  await expect(page.getByTestId('withdraw-of_q1')).toBeVisible()
+  await expect(page.getByTestId('status-of_lost')).toContainText('لم يُختَر')
+})
+
+test('my offers: summary strips match format.js commission tiers (10% / 6%)', async ({ page }) => {
+  await openMyOffers(page)
+
+  // ≤ 50 000 دج → 10%: 1 800 − 180 = 1 620.
+  const s10 = page.getByTestId('summary-of_1')
+  await expect(s10).toContainText('10%')
+  await expect(s10).toContainText('180 دج')
+  await expect(s10).toContainText('1 620 دج')
+
+  // > 50 000 دج → 6%: 62 000 − 3 720 = 58 280.
+  const s6 = page.getByTestId('summary-of_won2')
+  await expect(s6).toContainText('6%')
+  await expect(s6).toContainText('3 720 دج')
+  await expect(s6).toContainText('58 280 دج')
+})
+
+test('my offers: prep toggle flips and add-brand grows the group', async ({ page }) => {
+  await openMyOffers(page)
+
+  // Prep/deliver toggle on the won offer's row.
+  const toggle = page.getByTestId('deliver-of_won2')
+  await expect(toggle).toContainText('أكّد التسليم')
+  await toggle.click()
+  await expect(toggle).toContainText('تم التسليم')
+
+  // "+ عرض لعلامة أخرى" reopens the offer modal for MT-10501 and appends.
+  await page.getByTestId('add-brand-MT-10501').click()
+  await expect(page.getByTestId('offer-modal')).toBeVisible()
+  await page.getByTestId('offer-price').fill('6100')
+  await page.getByTestId('offer-brand').fill('Sachs')
+  await page.getByTestId('offer-country').selectOption('ألمانيا')
+  await page.getByTestId('offer-agree').check()
+  await page.getByTestId('offer-submit').click()
+  await expect(page.getByRole('heading', { name: 'تم إرسال عرضك' })).toBeVisible()
+  await page.getByTestId('offer-done').click()
+  await expect(page.getByTestId('group-count-MT-10501')).toHaveText('3 عروض')
+})
+
+test('my offers: withdraw free vs late strikes, 3rd late locks pricing', async ({ page }) => {
+  await openMyOffers(page)
+
+  // of_1 is inside the 15-min window → free withdrawal, no counter bump.
+  await page.getByTestId('withdraw-of_1').click()
+  await expect(page.getByTestId('withdraw-modal')).toContainText('نافذة التصحيح')
+  await page.getByTestId('withdraw-confirm').click()
+  await expect(page.getByTestId('status-of_1')).toContainText('مسحوب')
+
+  // of_2 is late (seed warns=1 → this is strike #2) → amber warning copy.
+  await page.getByTestId('withdraw-of_2').click()
+  await expect(page.getByTestId('withdraw-modal')).toContainText('ثاني عملية سحب')
+  await page.getByTestId('withdraw-confirm').click()
+  await expect(page.getByTestId('status-of_2')).toContainText('مسحوب')
+
+  // of_q2 is late → strike #3 → red final copy, then pricing locks (R2).
+  await page.getByTestId('withdraw-of_q2').click()
+  await expect(page.getByTestId('withdraw-modal')).toContainText('ثالث عملية سحب')
+  await page.getByTestId('withdraw-confirm').click()
+
+  // Remaining submitted rows lose their withdraw button → "التسعير موقوف".
+  await expect(page.getByTestId('status-of_q1')).toContainText('قيد المراجعة')
+  await expect(page.getByTestId('withdraw-of_q1')).toHaveCount(0)
+  await expect(page.getByText('التسعير موقوف مؤقتاً', { exact: false })).toBeVisible() // R2Banner
+})
