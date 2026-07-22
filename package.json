@@ -6,16 +6,19 @@
   "scripts": {
     "dev": "vite",
     "build": "vite build",
-    "preview": "vite preview",
-    "test:e2e": "node e2e/smoke.mjs"
+    "preview": "npm run build && wrangler dev",
+    "test:e2e": "node e2e/smoke.mjs",
+    "deploy": "npm run build && wrangler deploy"
   },
   "dependencies": {
     "react": "^18.3.1",
     "react-dom": "^18.3.1"
   },
   "devDependencies": {
+    "@cloudflare/vite-plugin": "^1.46.0",
     "@vitejs/plugin-react": "^4.7.0",
     "playwright-core": "^1.61.1",
-    "vite": "^6.4.3"
+    "vite": "^6.4.3",
+    "wrangler": "^4.113.0"
   }
 }
