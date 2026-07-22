@@ -60,8 +60,18 @@ src/
     Footer.jsx             Social links + footer
     Assistant.jsx          الميسر chat: FAB, panel, suggestion chips, typing indicator,
                            WhatsApp escalation links
-e2e/
-  smoke.mjs                Playwright end-to-end smoke test (31 assertions, see below)
+playwright.config.js       @playwright/test config: webServer builds + serves on :4173
+e2e/                       End-to-end specs (31 assertions across 9 area files, see below)
+  helpers.js               Shared flow helpers (login, reach-part/details/hub, error collector)
+  landing.spec.js          Area 1 — Landing (5)
+  login.spec.js            Area 2 — Login (4)
+  vehicle-step.spec.js     Area 3 — Vehicle step (2)
+  part-step.spec.js        Area 4 — Part step (2)
+  details-submit.spec.js   Area 5 — Details + submit (6)
+  orders-hub.spec.js       Area 6 — Orders hub (3)
+  account.spec.js          Area 7 — Account (3)
+  assistant.spec.js        Area 8 — الميسر assistant (3)
+  session-layout.spec.js   Area 9 — Session + layout (3)
 ```
 
 **How it fits together.** `App.jsx` owns a single state object (`useState`) and passes
@@ -231,20 +241,23 @@ All swap points are in **`src/App.jsx`** unless noted.
 
 ```bash
 npm install
-npm run dev        # Vite dev server → http://localhost:5173
-npm run build      # production build → dist/
-npm run preview    # serve the production build
+npm run test:e2e:install   # one-time: fetch the Playwright Chromium build
+npm run dev                # Vite dev server → http://localhost:5173
+npm run build              # production build → dist/
+npm run preview            # serve the production build → http://localhost:4173
 
-# End-to-end smoke test (dev server must be running in another terminal):
-npm run test:e2e   # runs e2e/smoke.mjs with playwright-core
+# End-to-end tests (@playwright/test):
+npm run test:e2e           # builds, serves on :4173, runs e2e/*.spec.js
 ```
 
-The e2e test uses `playwright-core` (no bundled browsers) and expects a Chromium
-binary at `/opt/pw-browsers/chromium` — **set `CHROMIUM_PATH=/path/to/chrome` to
-point it at any local Chrome/Chromium**. It saves step screenshots to `e2e/shots/`
-(gitignored).
+The e2e suite uses `@playwright/test` (matching `seller-app/`). Its
+`playwright.config.js` owns a `webServer` that runs `npm run build && npm run
+preview` and waits on `http://localhost:4173`, so no separate dev server is
+needed. Run `npm run test:e2e:install` once to fetch the browser; in managed
+environments a system Chromium can be supplied via `CHROMIUM_PATH` instead
+(e.g. `CHROMIUM_PATH=/opt/pw-browsers/chromium npm run test:e2e`).
 
-**What the 31 assertions cover**, in execution order:
+**What the 31 assertions cover**, grouped by area (one spec file each):
 
 1. *Landing (5):* RTL direction, hero headline, login card visible when logged out,
    exactly 4 how-it-works steps, exactly 6 FAQ items.
