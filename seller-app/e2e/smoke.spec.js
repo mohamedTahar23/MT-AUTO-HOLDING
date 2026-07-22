@@ -104,6 +104,42 @@ test('sign in → pricing queue → submit an offer', async ({ page }) => {
   await expect(page.getByTestId('quote-MT-10482')).toContainText('تم تقديم عرضك')
 })
 
+test('valid email advances to the OTP screen (send-code → أدخل رمز الدخول)', async ({ page }) => {
+  await page.goto('/')
+
+  // The reported bug: clicking "إرسال رمز الدخول" must reveal the 6-box OTP screen.
+  await page.getByPlaceholder('vendeur@mtauto.cloud').fill('owner@alamine-parts.dz')
+  await page.getByTestId('send-code').click()
+
+  await expect(page.getByRole('heading', { name: 'أدخل رمز الدخول' })).toBeVisible()
+  await expect(page.getByTestId('otp-0')).toBeVisible()
+  await expect(page.getByTestId('verify')).toContainText('تأكيد ودخول')
+  await expect(page.getByTestId('resend-timer')).toBeVisible() // resend countdown
+})
+
+test('malformed email shows an inline error and stays on login', async ({ page }) => {
+  await page.goto('/')
+  await page.getByPlaceholder('vendeur@mtauto.cloud').fill('not-an-email')
+  await page.getByTestId('send-code').click()
+
+  await expect(page.getByText('الرجاء إدخال بريد إلكتروني صحيح')).toBeVisible()
+  await expect(page.getByTestId('otp-0')).toBeHidden() // never left the login step
+})
+
+test('unregistered email → OTP → join request form', async ({ page }) => {
+  await page.goto('/')
+
+  // Any valid but unregistered email now reaches the OTP screen (the fix),
+  // then routes to the "طلب الانضمام" form once the code is confirmed.
+  await page.getByPlaceholder('vendeur@mtauto.cloud').fill('newshop@example.com')
+  await page.getByTestId('send-code').click()
+  await expect(page.getByTestId('otp-0')).toBeVisible()
+
+  for (let i = 0; i < 6; i++) await page.getByTestId(`otp-${i}`).fill(String((i + 1) % 10))
+  await page.getByTestId('verify').click()
+  await expect(page.getByRole('heading', { name: 'طلب الانضمام كبائع' })).toBeVisible()
+})
+
 test('offer submit stays disabled until price/brand/country/agreement are valid', async ({ page }) => {
   await page.goto('/')
   await page.getByPlaceholder('vendeur@mtauto.cloud').fill('owner@alamine-parts.dz')

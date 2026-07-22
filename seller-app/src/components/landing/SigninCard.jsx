@@ -106,8 +106,8 @@ export default function SigninCard({ onSubmit }) {
         </form>
 
         <p className="hint" style={{ marginTop: 14, textAlign: 'center' }}>
-          وضع التجربة — الرمز <b>123456</b>. جرّب <Ltr>owner@alamine-parts.dz</Ltr> (نشط) — أو أي بريد آخر
-          للانتقال إلى نموذج طلب الانضمام.
+          وضع التجربة — الرمز <b>123456</b>. جرّب <Ltr>owner@alamine-parts.dz</Ltr> (نشط)، أو أي بريد آخر —
+          وبعد تأكيد الرمز ينتقل البريد غير المسجّل إلى نموذج طلب الانضمام.
         </p>
       </div>
     </section>
