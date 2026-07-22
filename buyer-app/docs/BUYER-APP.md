@@ -13,9 +13,9 @@ scope agreed for the first pass: **the front door only** — landing, login, req
 wizard, orders list, account, and the assistant chat. The deep order-tracking journey
 is stubbed (see [Stubbed / out of scope](#stubbed--out-of-scope)).
 
-> **Path note:** in the `MT-AUTO-HOLDING` GitHub repo the app lives at the repository
-> root (`src/`, `e2e/`, `index.html`, …). All paths below are relative to the app
-> root. In the original design-handoff workspace the same tree sat under `buyer-app/`.
+> **Path note:** in the `MT-AUTO-HOLDING` GitHub repo the app lives under `buyer-app/`
+> (`buyer-app/src/`, `buyer-app/e2e/`, `buyer-app/index.html`, …), alongside the seller
+> app in `seller-app/`. All paths below are relative to the app root (`buyer-app/`).
 
 ---
 
@@ -273,11 +273,6 @@ point it at any local Chrome/Chromium**. It saves step screenshots to `e2e/shots
 
 ## Known quirks
 
-- **Duplicate files at the repo root** (GitHub repo only): an early manual upload
-  left copies of some component files (`App.jsx`, `Header.jsx`, …) at the repository
-  root. **The live code is exclusively under `src/`** — the build only imports from
-  `src/` via `index.html → src/main.jsx`. The root copies are dead weight; safe to
-  delete in one commit whenever convenient.
 - **Missing hero photo.** The design's hero references `IMG_20251011_101535.jpg`,
   which was not included in the design export. The `url()` layer was removed from
   `.req-hero` in `src/styles/site.css` (a comment marks the spot); the navy gradient
