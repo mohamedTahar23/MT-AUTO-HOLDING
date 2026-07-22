@@ -33,9 +33,10 @@ Real implementation of the Claude Design prototype **`project/**** MT AUTO - BUY
 
 ```bash
 npm install
-npm run dev        # http://localhost:5173
-npm run build      # production build in dist/
-npm run test:e2e   # Playwright smoke test (needs dev server running + Chromium; CHROMIUM_PATH env overrides the binary)
+npm run test:e2e:install   # one-time: fetch Playwright's Chromium
+npm run dev                # http://localhost:5173
+npm run build              # production build in dist/
+npm run test:e2e           # @playwright/test — builds, serves on :4173, runs e2e/*.spec.js
 ```
 
-The e2e test drives the whole happy path: landing → login/OTP → wizard (saved car → part + photo → delivery details + geo) → terms gate → submit → orders hub → journey stub → account/edit → assistant → logout → mobile-overflow check. 31 assertions.
+The e2e suite (`@playwright/test`, like `seller-app/`) covers the whole happy path — landing → login/OTP → wizard (saved car → part + photo → delivery details + geo) → terms gate → submit → orders hub → journey stub → account/edit → assistant → logout → mobile-overflow check — as **31 assertions across 9 area spec files** in `e2e/`. `playwright.config.js` auto-builds and serves the app, so no separate dev server is needed (in managed environments set `CHROMIUM_PATH` instead of installing browsers).
