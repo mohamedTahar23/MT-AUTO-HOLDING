@@ -7,9 +7,6 @@ const SELL = [
   { name: 'quotes', label: 'عروضي', perm: 'pricing', badge: 'quotes', tone: 'grey' },
   { name: 'deliveries', label: 'التسليمات', perm: 'pricing', badge: 'deliveries', tone: 'amber' },
   { name: 'payouts', label: 'الأرباح', perm: 'payout' },
-  { name: 'performance', label: 'الأداء والتقييم' },
-  { name: 'messages', label: 'الرسائل' },
-  { name: 'feed', label: 'إعلانات MT' },
 ]
 
 export default function Sidebar({ counts }) {
