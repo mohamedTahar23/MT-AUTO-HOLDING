@@ -65,7 +65,8 @@ seller-app/
    └─ components/
       ├─ auth/                # LoginGate (landing orchestrator) · Otp · ApplyForm · UnderReview
       ├─ landing/             # the full marketing landing, one component per design section
-      ├─ shell/               # AppShell · Header · Sidebar · R2Banner
+      ├─ shell/               # AppShell · Header (sell ⇄ buy mode toggle) · Sidebar · R2Banner
+      ├─ buy/                 # BuyLanding — الشراء coming-soon page + demo wholesale search
       ├─ screens/             # Queue · MyOffers · Deliveries · Payouts · Performance · Messages · Feed
       ├─ modals/              # OfferModal · WithdrawModal · VideoModal
       └─ ui/                  # bits (Ltr/Pill/RefChip/Tile) · Modal · Stepper · Toaster
@@ -125,10 +126,18 @@ card) · سوق الجملة (قريباً + the parts-search-engine example) ·
 footer. Notes: the FR side of the language toggle is disabled with a «قريباً» badge until French content ships;
 the map drop-area previews the image client-side only (nothing is uploaded).
 
+The header's **البيع ⇄ الشراء** toggle (persisted) switches the whole app between the sell
+dashboard and the **الشراء** coming-soon landing (`components/buy/BuyLanding.jsx`): navy hero,
+an interactive demo of the wholesale search engine (matches the seeded catalog by official
+ref, alias/old/short refs, part name or vehicle name — `api.getWholesaleDemo()`), the
+benefits/methods sections, the 5 buying steps and the sourcing-network banner. Everything
+except the demo search is static marketing content until Path B ships.
+
 Remaining screens from the prototype, stubbed as «قيد الإنشاء» pages: team & permissions
 (دعوة الموظفين + perms editor), account settings, staff activity log, employee invite
-activation, re-confirmation task UI, and the seven Path-B purchasing screens (المشتريات).
-Each is fully specced in `project/handoff/` and the seller `.dc.html`.
+activation, re-confirmation task UI, and the seven Path-B purchasing screens (المشتريات) —
+fronted for now by the الشراء landing above. Each is fully specced in `project/handoff/`
+and the seller `.dc.html`.
 
 Known open items the handoff says to confirm with the owner (not guessed here): exact
 post-15-min withdrawal penalty beyond the 3-warning track, offers grouping when one shop

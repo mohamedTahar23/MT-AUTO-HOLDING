@@ -190,6 +190,12 @@ export const mockApi = {
     await delay(120)
     return clone(seed.ads)
   },
+  async getWholesaleDemo() {
+    await delay(120)
+    // Demo catalog for the Buy-landing search — static marketing data, so no
+    // session gate (the page itself already sits behind the shell).
+    return clone(seed.wholesaleDemo)
+  },
   getMeta() {
     return { countries: seed.countries, brandChips: seed.brandChips, wilayas: seed.wilayas, carBrandGroups: seed.carBrandGroups }
   },

@@ -437,3 +437,88 @@ test('earnings: confirming receipt flips the toggle and moves the amount', async
   // Only the confirmed card flipped; the other paid cards still ask.
   await expect(page.getByTestId('receipt-toggle-MT-4688')).toContainText('أكّد استلام دفعتك')
 })
+
+// ---- الشراء (Buy mode) ------------------------------------------------------
+
+async function openBuy(page) {
+  await page.goto('/')
+  await page.getByPlaceholder('vendeur@mtauto.cloud').fill('owner@alamine-parts.dz')
+  await page.getByTestId('send-code').click()
+  for (let i = 0; i < 6; i++) await page.getByTestId(`otp-${i}`).fill('1')
+  await page.getByTestId('verify').click()
+  await expect(page.getByRole('heading', { name: 'طابور التسعير' })).toBeVisible()
+  await page.getByTestId('mode-toggle-buy').click()
+  await expect(page.getByRole('heading', { name: 'اشترِ بسعر الجملة الحقيقي' })).toBeVisible()
+}
+
+test('buy mode: toggle opens the wholesale landing and toggles back', async ({ page }) => {
+  await openBuy(page)
+
+  // The landing renders top to bottom: hero pill, empty search state, the
+  // benefit/method sections, the 5 steps, network banner and footer strip.
+  await expect(page.getByText('الإطلاق قريباً جداً')).toBeVisible()
+  await expect(page.getByTestId('buy-result-empty')).toBeVisible()
+  await expect(page.getByText('مخزون بين يديك')).toBeVisible()
+  await expect(page.getByText('أرسل قائمتك — صورة أو جدول')).toBeVisible()
+  await expect(page.getByRole('heading', { name: 'خطوات الشراء' })).toBeVisible()
+  await expect(page.getByText('نجمع طلبك من شبكة واسعة من تجّار الجملة والموردين.')).toBeVisible()
+  await expect(page.getByText('آلاف الأرقام المرجعية، وتزداد كلّ أسبوع', { exact: false })).toBeVisible()
+
+  // Buy mode is a single landing — the sell sidebar is gone.
+  await expect(page.getByTestId('nav-queue')).toHaveCount(0)
+
+  // Toggling back restores the sell dashboard.
+  await page.getByTestId('mode-toggle-sell').click()
+  await expect(page.getByRole('heading', { name: 'طابور التسعير' })).toBeVisible()
+  await expect(page.getByTestId('nav-queue')).toBeVisible()
+})
+
+test('buy mode: the choice persists across a reload', async ({ page }) => {
+  test.slow() // full login + reload → generous budget on loaded machines
+  await openBuy(page)
+
+  await page.reload()
+  await expect(page.getByRole('heading', { name: 'اشترِ بسعر الجملة الحقيقي' })).toBeVisible()
+  await expect(page.getByTestId('mode-toggle-buy')).toBeVisible()
+})
+
+test('buy search: alias ref hit renders the demo result card with supplier prices', async ({ page }) => {
+  await openBuy(page)
+
+  await page.getByTestId('buy-search-input').fill('2M803-24410')
+  await page.getByTestId('buy-search-btn').click()
+
+  const result = page.getByTestId('buy-result')
+  await expect(result).toBeVisible()
+  await expect(result).toContainText('يطابق هذه القطعة')
+  await expect(result).toContainText('رقم رسمي')
+  await expect(result).toContainText('Tendeur de chaîne')
+  await expect(result).toContainText('Sportage 5 · Tucson · Seltos')
+
+  // Wholesale supplier rows: brand + price range.
+  await expect(result).toContainText('Mobis')
+  await expect(result).toContainText('9 250 – 10 500 دج')
+  await expect(page.getByTestId('buy-result-empty')).toHaveCount(0)
+})
+
+test('buy search: vehicle-name hit, and a nonsense query shows the no-match state', async ({ page }) => {
+  await openBuy(page)
+
+  const input = page.getByTestId('buy-search-input')
+
+  // By vehicle name (no ref needed).
+  await input.fill('Sportage 5')
+  await page.getByTestId('buy-search-btn').click()
+  await expect(page.getByTestId('buy-result')).toContainText('Tendeur de chaîne')
+
+  // By the short marketing abbreviation (Enter submits too).
+  await input.fill('TEN CH SPO')
+  await input.press('Enter')
+  await expect(page.getByTestId('buy-result')).toContainText('Mobis')
+
+  // Nonsense → the muted no-match state replaces the result card.
+  await input.fill('XYZ-0000')
+  await page.getByTestId('buy-search-btn').click()
+  await expect(page.getByTestId('buy-result')).toHaveCount(0)
+  await expect(page.getByTestId('buy-result-empty')).toContainText('لا نتائج')
+})
