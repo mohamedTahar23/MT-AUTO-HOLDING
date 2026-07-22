@@ -30,6 +30,8 @@ const db = {
   offers: clone(seed.offers),
   orders: clone(seed.orders),
   payouts: clone(seed.payouts),
+  payoutReceived: [], // refs of paid payouts the shop confirmed receiving — seeded empty
+
   messages: clone(seed.messages),
   events: [],
 }
@@ -157,7 +159,12 @@ export const mockApi = {
   async getPayouts() {
     await delay()
     requireSession()
-    return clone(db.payouts)
+    // Rows carry a derived `received` flag (per-ref set, user-confirmed via the
+    // receipt toggle). baseline = lifetime received total before these rows.
+    return {
+      baseline: seed.PAYOUT_BASELINE,
+      rows: clone(db.payouts).map((p) => ({ ...p, received: db.payoutReceived.includes(p.ref) })),
+    }
   },
   async getPerformance() {
     await delay(160)
@@ -278,6 +285,19 @@ export const mockApi = {
     order.tracking = ['تجهيز', 'استلمها الناقل']
     logEvent('mark_handover', `${orderId} · ${order.labelCode}`)
     return clone(order)
+  },
+
+  // confirm_payout_receipt — shop attests a paid transfer actually reached its
+  // account. Moves the amount from «قيد الانتظار» into the received total.
+  async confirmPayoutReceipt(ref) {
+    await delay(300)
+    requireSession()
+    const payout = db.payouts.find((p) => p.ref === ref)
+    if (!payout) throw new Error('الدفعة غير موجودة')
+    if (payout.status !== 'paid') throw new Error('لا يمكن تأكيد استلام دفعة لم تُحوَّل بعد')
+    if (!db.payoutReceived.includes(ref)) db.payoutReceived.push(ref)
+    logEvent('confirm_payout_receipt', ref)
+    return { ok: true, ref }
   },
 
   // reconfirm_offer — confirm availability+price on a re-selected frozen offer.

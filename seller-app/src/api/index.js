@@ -12,7 +12,8 @@
 //                         applyShop (apply_shop), currentSession, signOut
 //   RPC mutations:        submitOffer (submit_offer), withdrawOffer (withdraw_offer),
 //                         uploadProof (upload_proof), markHandover (mark_handover),
-//                         reconfirmOffer (reconfirm_offer)
+//                         reconfirmOffer (reconfirm_offer),
+//                         confirmPayoutReceipt (confirm_payout_receipt)
 //
 // Real adapter sketch (supabase.js):
 //   verifyOtp(email, code) -> supabase.auth.verifyOtp({ email, token: code, type: 'email' })

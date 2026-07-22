@@ -407,14 +407,21 @@ export const orders = [
   },
 ]
 
-// Payouts — net = agreed price, held until delivery confirmed.
-// status: مجمّد (held) | مستحق (due) | تم (paid). COD collected by MT, never the shop.
+// Payouts (الأرباح) — orders that reached the buyer; amounts are held until
+// transferred to the shop. status ∈ delivered (awaiting COD collection) |
+// collected (MT holds the money) | paid (transferred, paidAt = dd/mm) |
+// dispute (frozen — surfaces under التسليمات as «قيد النزاع», never here).
+// PAYOUT_BASELINE = lifetime total already received before these rows; the
+// receipt toggle adds each confirmed paid amount on top of it.
+export const PAYOUT_BASELINE = 494700
 export const payouts = [
-  { orderId: 'MT-10405', partName: 'حساس أكسجين', net: 3600, status: 'مستحق', when: mins(60) },
-  { orderId: 'MT-10391', partName: 'دواسة فرامل', net: 2400, status: 'تم', when: mins(1440) },
-  { orderId: 'MT-10377', partName: 'مقبض باب', net: 1500, status: 'تم', when: mins(2880) },
-  { orderId: 'MT-10422', partName: 'ذراع تعليق', net: 5100, status: 'مجمّد', when: null },
-  { orderId: 'MT-10459', partName: 'قرص دبرياج', net: 9200, status: 'مجمّد', when: null },
+  { ref: 'MT-4702', partName: 'Phare avant', car: 'Golf', amount: 6500, status: 'delivered', paidAt: null },
+  { ref: 'MT-4695', partName: 'Batterie', car: 'Renault Clio', amount: 12000, status: 'collected', paidAt: null },
+  { ref: 'MT-4688', partName: "Kit d'essuie-glaces", car: 'Peugeot 301', amount: 1800, status: 'paid', paidAt: '02/10' },
+  { ref: 'MT-4676', partName: 'Alternateur', car: 'Hyundai i10', amount: 14000, status: 'paid', paidAt: '28/09' },
+  { ref: 'MT-4661', partName: 'Plaquettes', car: 'Renault Symbol', amount: 2400, status: 'paid', paidAt: '21/09' },
+  // The disputed shipment (see orders MT-4726) — frozen, excluded from الأرباح.
+  { ref: 'MT-4726', partName: 'Bras de suspension', car: 'Kia Picanto', amount: 6400, status: 'dispute', paidAt: null },
 ]
 
 // Performance (الأداء والتقييم).
