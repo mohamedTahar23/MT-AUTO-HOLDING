@@ -305,3 +305,68 @@ test('my offers: withdraw free vs late strikes, 3rd late locks pricing', async (
   await expect(page.getByTestId('withdraw-of_q1')).toHaveCount(0)
   await expect(page.getByText('التسعير موقوف مؤقتاً', { exact: false })).toBeVisible() // R2Banner
 })
+
+// ---- التسليمات (Deliveries) -------------------------------------------------
+
+async function openDeliveries(page, email = 'owner@alamine-parts.dz') {
+  await page.goto('/')
+  await page.getByPlaceholder('vendeur@mtauto.cloud').fill(email)
+  await page.getByTestId('send-code').click()
+  for (let i = 0; i < 6; i++) await page.getByTestId(`otp-${i}`).fill('1')
+  await page.getByTestId('verify').click()
+  await expect(page.getByRole('heading', { name: 'طابور التسعير' })).toBeVisible()
+  await page.getByTestId('nav-deliveries').click()
+  await expect(page.getByRole('heading', { name: 'التسليمات' })).toBeVisible()
+}
+
+test('deliveries: a status pill of every kind renders', async ({ page }) => {
+  await openDeliveries(page)
+
+  // Derived from stage (video → pack) — the only action-needed (amber) pill.
+  const pack = page.getByTestId('status-MT-10459')
+  await expect(pack).toHaveText('بانتظار التسليم')
+  await expect(pack).toHaveClass(/pill-amber/)
+
+  // Stored delivery statuses — all neutral pills.
+  await expect(page.getByTestId('status-MT-4741')).toHaveText('سُلّمت للشركة')
+  await expect(page.getByTestId('status-MT-4719')).toHaveText('في الطريق')
+  await expect(page.getByTestId('status-MT-4702')).toHaveText('في المعاينة')
+  await expect(page.getByTestId('status-MT-4726')).toHaveText('قيد النزاع')
+  await expect(page.getByTestId('status-MT-10405')).toHaveText('مدفوع')
+  await expect(page.getByTestId('status-MT-4726')).toHaveClass(/pill-grey/)
+})
+
+test('deliveries: progress fill grows picked → transit → delivered → paid', async ({ page }) => {
+  await openDeliveries(page)
+
+  const fillPct = async (id) => {
+    const style = await page.getByTestId(`delivery-${id}`).locator('.dtrack-fill').getAttribute('style')
+    return parseInt(style.match(/width:\s*(\d+)%/)[1], 10)
+  }
+  const widths = [await fillPct('MT-4741'), await fillPct('MT-4719'), await fillPct('MT-4702'), await fillPct('MT-10405')]
+  expect(widths).toEqual([0, 33, 67, 100])
+})
+
+test('deliveries: dispute panel — owner gets the WhatsApp CTA', async ({ page }) => {
+  await openDeliveries(page)
+
+  const dispute = page.getByTestId('dispute-MT-4726')
+  await expect(dispute).toContainText('النزاع يُحلّ عبر واتساب')
+  const wa = page.getByTestId('dispute-wa-MT-4726')
+  await expect(wa).toBeVisible()
+  await expect(wa).toHaveAttribute('href', /wa\.me\/213659401338/)
+
+  // The dispute panel only exists on the disputed card.
+  await expect(page.getByTestId('dispute-MT-4719')).toHaveCount(0)
+})
+
+test('deliveries: dispute panel — staff sees the in-platform text, no link', async ({ page }) => {
+  await openDeliveries(page, 'samir@alamine-parts.dz')
+
+  const dispute = page.getByTestId('dispute-MT-4726')
+  await expect(dispute).toContainText('يُحلّ النزاع داخل المنصة')
+  await expect(page.getByTestId('dispute-wa-MT-4726')).toHaveCount(0)
+
+  // Everything else is identical to the owner view — same tracker + pill.
+  await expect(page.getByTestId('status-MT-4726')).toHaveText('قيد النزاع')
+})

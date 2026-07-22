@@ -146,6 +146,14 @@ export const mockApi = {
     requireSession()
     return clone(db.orders)
   },
+  async getDeliveries() {
+    await delay()
+    requireSession()
+    // Tracking view of confirmed orders. Stored stages are never renamed —
+    // orders without an explicit `delivery` status derive one from `stage`.
+    const STAGE_TO_STATUS = { video: 'pack', handover: 'pack', transit: 'transit', done: 'delivered' }
+    return clone(db.orders).map((o) => ({ ...o, deliveryStatus: o.delivery || STAGE_TO_STATUS[o.stage] || 'pack' }))
+  },
   async getPayouts() {
     await delay()
     requireSession()
