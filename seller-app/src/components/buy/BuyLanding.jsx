@@ -195,7 +195,7 @@ export default function BuyLanding() {
         <div className="card buy-search">
           <div className="buy-search-eyebrow">
             <span className="buy-try muted">
-              لتجربة، اكتب <Ltr mono>24410-2M803</Ltr> أو <Ltr mono>TEN CH SPO</Ltr>
+              لتجربة، اكتب <Ltr mono>2M803-24410</Ltr> أو <Ltr mono>TEN CH SPO</Ltr>
             </span>
             <span className="pill pill-amber">مثال توضيحي — تجربة تفاعلية</span>
           </div>
