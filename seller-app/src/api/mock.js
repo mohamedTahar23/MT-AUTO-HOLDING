@@ -182,6 +182,13 @@ export const mockApi = {
     logEvent('message', text.slice(0, 60))
     return clone(msg)
   },
+  async getActivityLog() {
+    await delay(160)
+    const s = requireSession()
+    // Owner-only read — staff never see the audit trail, mirroring the UI gate.
+    if (s.user.role !== 'owner') throw new Error('سجل النشاط متاح للمالك فقط')
+    return clone(seed.activityLog)
+  },
   async getAnnouncements() {
     await delay(120)
     return clone(seed.announcements)

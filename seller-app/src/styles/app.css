@@ -1585,6 +1585,11 @@
   inset: auto;
   z-index: 1;
 }
+/* site.css: .acct-menu{display:none} toggled via .open (buyer nav dropdown) —
+   ours mounts conditionally from React state and must always render. */
+.acct .acct-menu {
+  display: block;
+}
 /* site.css: .field .err{display:none} would hide our .input.err / .select.err fields. */
 .field .input.err,
 .field .select.err {
@@ -2623,4 +2628,98 @@
   .buy-steps-row {
     grid-template-columns: 1fr;
   }
+}
+
+/* ============================================================================
+   Activity log (سجل نشاط الموظفين) — owner-only staff audit list: one white
+   card with a faint column-header row, then attributed rows (initial avatar,
+   sentence, optional meta, kind dot, time). Tokens only.
+   ========================================================================== */
+.act-card {
+  margin-top: 18px;
+  background: var(--card);
+  border: 1px solid var(--line);
+  border-radius: 14px;
+  overflow: hidden;
+}
+.act-head,
+.act-row {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 10px 16px;
+}
+.act-head {
+  color: var(--faint);
+  font-size: 11px;
+  font-weight: 800;
+  border-bottom: 1px solid var(--line);
+}
+.act-main {
+  flex: 1;
+  min-width: 0;
+}
+.act-time {
+  flex: 0 0 110px;
+  color: var(--faint);
+  font-size: 12.5px;
+  font-variant-numeric: tabular-nums;
+}
+.act-row {
+  padding: 13px 16px;
+  border-bottom: 1px solid var(--line-2);
+}
+.act-row:last-child {
+  border-bottom: 0;
+}
+.act-avatar {
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  background: var(--line-2);
+  color: var(--navy-850);
+  display: grid;
+  place-items: center;
+  font-weight: 800;
+  font-size: 14px;
+  flex: none;
+}
+.act-line {
+  font-size: 13.5px;
+  line-height: 1.7;
+}
+.act-line b {
+  color: var(--navy-850);
+  font-weight: 700;
+}
+.act-verb {
+  color: var(--faint);
+}
+.act-meta {
+  margin-top: 2px;
+  font-size: 12px;
+  color: var(--muted);
+  font-variant-numeric: tabular-nums;
+}
+.act-dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  flex: none;
+}
+.act-dot.quote {
+  background: var(--amber);
+}
+.act-dot.message {
+  background: var(--blue);
+}
+.act-dot.delivery {
+  background: var(--green);
+}
+.act-dot.withdraw,
+.act-dot.alert {
+  background: var(--red);
+}
+.act-dot.other {
+  background: var(--faint);
 }

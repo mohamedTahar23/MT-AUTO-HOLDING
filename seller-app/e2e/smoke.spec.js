@@ -524,3 +524,65 @@ test('buy search: vehicle-name hit, and a nonsense query shows the no-match stat
   await expect(page.getByTestId('buy-result')).toContainText('Mobis')
   await expect(page.getByTestId('buy-result-empty')).toHaveCount(0)
 })
+
+// ---- سجل نشاط الموظفين (Activity log) ---------------------------------------
+
+async function signInAs(page, email) {
+  await page.goto('/')
+  await page.getByPlaceholder('vendeur@mtauto.cloud').fill(email)
+  await page.getByTestId('send-code').click()
+  for (let i = 0; i < 6; i++) await page.getByTestId(`otp-${i}`).fill('1')
+  await page.getByTestId('verify').click()
+  await expect(page.getByRole('heading', { name: 'طابور التسعير' })).toBeVisible()
+}
+
+test('activity log: owner opens it from the account menu — ≥6 attributed rows, every dot color, meta amounts', async ({
+  page,
+}) => {
+  await signInAs(page, 'owner@alamine-parts.dz')
+
+  // Reachable via the header account menu (owner section).
+  await page.locator('.acct-btn').click()
+  await page.getByRole('button', { name: /سجل نشاط الموظفين/ }).click()
+
+  const screen = page.getByTestId('activity-screen')
+  await expect(screen).toBeVisible()
+  await expect(page.getByRole('heading', { name: 'سجل نشاط الموظفين' })).toBeVisible()
+  await expect(screen).toContainText('كل إجراء يقوم به موظفوك يُنسَب إلى صاحبه')
+
+  // Column header row + at least 6 attributed rows.
+  await expect(screen.getByText('الموظف والإجراء')).toBeVisible()
+  await expect(screen.getByText('الوقت', { exact: true })).toBeVisible()
+  const rows = page.getByTestId('activity-row')
+  await expect(rows.first()).toBeVisible()
+  expect(await rows.count()).toBeGreaterThanOrEqual(6)
+
+  // Newest row: who + act + target + meta amount + time.
+  const first = rows.first()
+  await expect(first).toContainText('yacine@alamine-parts.dz')
+  await expect(first).toContainText('قدّم عرضاً على')
+  await expect(first).toContainText('Alternateur · MT-4795')
+  await expect(first).toContainText('14,000 دج')
+  await expect(first).toContainText('اليوم 09:14')
+
+  // Every kind → dot color appears (quote/message/delivery/withdraw/other).
+  for (const kind of ['quote', 'message', 'delivery', 'withdraw', 'other']) {
+    await expect(screen.locator(`.act-dot.${kind}`).first()).toBeVisible()
+  }
+
+  // Rows are attributed to STAFF only — the owner never appears in the list.
+  await expect(screen.getByText('owner@alamine-parts.dz')).toHaveCount(0)
+})
+
+test('activity log: staff cannot reach it — no menu entry, the screen never renders', async ({ page }) => {
+  await signInAs(page, 'samir@alamine-parts.dz')
+
+  // The staff account menu offers no activity entry (only the perms summary).
+  await page.locator('.acct-btn').click()
+  await expect(page.getByRole('button', { name: /سجل نشاط الموظفين/ })).toHaveCount(0)
+  await expect(page.getByRole('button', { name: /صلاحياتك/ })).toBeVisible()
+
+  // And the screen itself is nowhere in the DOM.
+  await expect(page.getByTestId('activity-screen')).toHaveCount(0)
+  await expect(page.getByTestId('activity-row')).toHaveCount(0)
+})
