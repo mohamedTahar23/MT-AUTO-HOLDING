@@ -10,6 +10,7 @@ import Payouts from '../screens/Payouts.jsx'
 import Performance from '../screens/Performance.jsx'
 import Messages from '../screens/Messages.jsx'
 import Feed from '../screens/Feed.jsx'
+import Activity from '../screens/Activity.jsx'
 import ComingSoon from '../screens/ComingSoon.jsx'
 import BuyLanding from '../buy/BuyLanding.jsx'
 
@@ -21,11 +22,14 @@ const SCREENS = {
   performance: Performance,
   messages: Messages,
   feed: Feed,
+  activity: Activity,
 }
+// Screens only the owner may open — staff routed here land back on the queue
+// (their only nav surfaces already hide these, this guards programmatic nav).
+const OWNER_ONLY = new Set(['activity'])
 const SOON_TITLES = {
   team: 'الفريق والصلاحيات',
   settings: 'إعدادات الحساب',
-  activity: 'سجل نشاط الموظفين',
 }
 
 export default function AppShell() {
@@ -46,7 +50,8 @@ export default function AppShell() {
     loadCounts()
   }, [route.name, loadCounts])
 
-  const Screen = SCREENS[route.name]
+  const routeName = OWNER_ONLY.has(route.name) && !isOwner ? 'queue' : route.name
+  const Screen = SCREENS[routeName]
   const r2 = shop?.r2?.active
 
   // Buy mode (header toggle) — the wholesale coming-soon landing, full width:

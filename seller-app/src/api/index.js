@@ -8,7 +8,8 @@
 //   Reads (RLS-guarded):  getShop, getShopUsers, getTasks (seller_task_v),
 //                         getOffers, getOrders, getPayouts, getPerformance,
 //                         getMessages, getAnnouncements, getMeta,
-//                         getWholesaleDemo (static Buy-landing demo catalog)
+//                         getWholesaleDemo (static Buy-landing demo catalog),
+//                         getActivityLog (owner-only staff audit trail)
 //   Auth:                 requestOtp, verifyOtp, signInWithGoogle,
 //                         applyShop (apply_shop), currentSession, signOut
 //   RPC mutations:        submitOffer (submit_offer), withdrawOffer (withdraw_offer),

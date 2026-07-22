@@ -439,6 +439,73 @@ export const performance = {
   standing: 'موثوق', // standing tier
 }
 
+// Staff activity log (سجل نشاط الموظفين) — owner-only audit trail. STAFF
+// actions only (the owner's own actions are never listed). Newest first.
+// kind ∈ quote | message | delivery | withdraw | alert | other — drives the
+// row's status-dot color on the activity screen.
+export const activityLog = [
+  {
+    id: 'act_1',
+    initial: 'ي',
+    who: 'yacine@alamine-parts.dz',
+    act: 'قدّم عرضاً على',
+    target: 'Alternateur · MT-4795',
+    meta: '14,000 دج',
+    time: 'اليوم 09:14',
+    kind: 'quote',
+  },
+  {
+    id: 'act_2',
+    initial: 'س',
+    who: 'samir@alamine-parts.dz',
+    act: 'ردّ على رسالة في',
+    target: 'Amortisseur · MT-4726',
+    meta: '',
+    time: 'اليوم 08:40',
+    kind: 'message',
+  },
+  {
+    id: 'act_3',
+    initial: 'س',
+    who: 'samir@alamine-parts.dz',
+    act: 'سلّم الطرد للناقل في',
+    target: "Kit d'embrayage · MT-4741",
+    meta: '',
+    time: 'اليوم 08:12',
+    kind: 'delivery',
+  },
+  {
+    id: 'act_4',
+    initial: 'ي',
+    who: 'yacine@alamine-parts.dz',
+    act: 'سحب عرضاً متأخراً على',
+    target: 'Pompe à eau · MT-4712',
+    meta: '6,500 دج',
+    time: 'أمس 18:22',
+    kind: 'withdraw',
+  },
+  {
+    id: 'act_5',
+    initial: 'س',
+    who: 'samir@alamine-parts.dz',
+    act: 'أكّد استلام دفعة',
+    target: "Kit d'essuie-glaces · MT-4688",
+    meta: '1,800 دج',
+    time: 'أمس 17:05',
+    kind: 'other',
+  },
+  {
+    id: 'act_6',
+    initial: 'ي',
+    who: 'yacine@alamine-parts.dz',
+    act: 'قدّم عرضاً على',
+    target: 'Phare avant · MT-4702',
+    meta: '17,800 دج',
+    time: 'أمس 15:48',
+    kind: 'quote',
+  },
+]
+
 // Messages — thread with the MT team only.
 export const messages = [
   { id: 'm1', from: 'MT', at: mins(120), text: 'مرحباً بكم في بوابة البائعين. أي استفسار نحن هنا للمساعدة.' },
