@@ -2,7 +2,7 @@ import { useState } from 'react'
 import { useApp } from '../../state/store.jsx'
 
 export default function Header() {
-  const { shop, session, isOwner, signOut, navigate } = useApp()
+  const { shop, session, isOwner, signOut, navigate, mode, setMode } = useApp()
   const [open, setOpen] = useState(false)
   const name = shop?.name || 'المحل'
   const initial = name.trim().charAt(0)
@@ -14,8 +14,55 @@ export default function Header() {
         <span className="logo">MT</span> MT AUTO
       </div>
 
+      {/* Sell ⇄ Buy mode — switches the whole app; choice persists (store). */}
+      <div className="mode-seg" role="group" aria-label="وضع اللوحة">
+        <button
+          type="button"
+          className={mode === 'sell' ? 'on' : ''}
+          data-testid="mode-toggle-sell"
+          onClick={() => setMode('sell')}
+        >
+          <svg viewBox="0 0 24 24" fill="none" aria-hidden>
+            <path
+              d="M12.6 3.5H19a1.5 1.5 0 0 1 1.5 1.5v6.4a2 2 0 0 1-.59 1.42l-7.09 7.09a2 2 0 0 1-2.83 0l-4.9-4.9a2 2 0 0 1 0-2.83l7.09-7.09a2 2 0 0 1 1.42-.59z"
+              stroke="currentColor"
+              strokeWidth="1.7"
+              strokeLinejoin="round"
+            />
+            <circle cx="15.8" cy="8.2" r="1.4" fill="currentColor" />
+          </svg>
+          البيع
+        </button>
+        <button
+          type="button"
+          className={mode === 'buy' ? 'on' : ''}
+          data-testid="mode-toggle-buy"
+          onClick={() => setMode('buy')}
+        >
+          <svg viewBox="0 0 24 24" fill="none" aria-hidden>
+            <path
+              d="M4 4h2l2.4 11.2a1.5 1.5 0 0 0 1.47 1.19h7.6a1.5 1.5 0 0 0 1.46-1.15L20.5 8H7"
+              stroke="currentColor"
+              strokeWidth="1.7"
+              strokeLinecap="round"
+              strokeLinejoin="round"
+            />
+            <circle cx="10.5" cy="20" r="1.4" fill="currentColor" />
+            <circle cx="17.5" cy="20" r="1.4" fill="currentColor" />
+          </svg>
+          الشراء
+        </button>
+      </div>
+
       <div className="acct">
-        <button className="bell" title="الإشعارات" onClick={() => navigate('feed')}>
+        <button
+          className="bell"
+          title="الإشعارات"
+          onClick={() => {
+            setMode('sell')
+            navigate('feed')
+          }}
+        >
           🔔<span className="badge">2</span>
         </button>
       </div>
@@ -40,13 +87,13 @@ export default function Header() {
           <div className="acct-menu" onMouseLeave={() => setOpen(false)}>
             {isOwner ? (
               <>
-                <button onClick={() => (navigate('settings'), setOpen(false))}>
+                <button onClick={() => (setMode('sell'), navigate('settings'), setOpen(false))}>
                   إعدادات الحساب<small>بيانات المحل والوثائق</small>
                 </button>
-                <button onClick={() => (navigate('team'), setOpen(false))}>
+                <button onClick={() => (setMode('sell'), navigate('team'), setOpen(false))}>
                   الفريق والصلاحيات<small>دعوة الموظفين والتحكم في صلاحياتهم</small>
                 </button>
-                <button onClick={() => (navigate('activity'), setOpen(false))}>
+                <button onClick={() => (setMode('sell'), navigate('activity'), setOpen(false))}>
                   سجل نشاط الموظفين<small>من فعل ماذا ومتى</small>
                 </button>
               </>

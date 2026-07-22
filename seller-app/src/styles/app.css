@@ -2254,3 +2254,373 @@
 .pay-toggle.on .pay-knob {
   left: 21px;
 }
+
+/* ============================================================================
+   Buy (الشراء) — header mode toggle + the wholesale coming-soon landing:
+   navy hero with the inset demo-search card, benefit/method card grids, the
+   5-step row, the amber network banner and the footer strip. Tokens only;
+   the demo result card reuses the .ws-* wholesale-example pattern.
+   ========================================================================== */
+
+/* Header segmented control: البيع ⇄ الشراء (active segment = navy fill). */
+.mode-seg {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  padding: 4px;
+  background: var(--card);
+  border: 1px solid var(--line);
+  border-radius: var(--pill);
+}
+.mode-seg button {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  min-height: 34px;
+  padding: 0 16px;
+  border: 0;
+  border-radius: var(--pill);
+  background: transparent;
+  color: var(--muted);
+  font-family: inherit;
+  font-size: 13.5px;
+  font-weight: 800;
+  cursor: pointer;
+  transition: background 0.15s, color 0.15s;
+}
+.mode-seg button:hover {
+  color: var(--navy-850);
+}
+.mode-seg button.on {
+  background: var(--navy-850);
+  color: #fff;
+}
+.mode-seg svg {
+  width: 15px;
+  height: 15px;
+  flex: none;
+}
+/* Both header .acct wrappers set margin-inline-start:auto — the two auto
+   margins split the free space and strand the bell mid-header. Only the first
+   one should push; the rest hug it (bell + shop switcher adjacent). */
+.acct + .acct {
+  margin-inline-start: 0;
+}
+
+/* Page container — a single centered column, no sidebar shell. */
+.buy-main {
+  padding-block-start: 28px;
+}
+.buy-inner {
+  max-width: 1120px;
+  margin: 0 auto;
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+/* ---- hero ---- */
+.buy-hero {
+  background: var(--navy-850);
+  color: #fff;
+  border-radius: 20px;
+  padding: 34px 36px 30px;
+}
+.buy-soon-pill {
+  background: rgba(255, 138, 31, 0.14); /* translucent amber on navy */
+  border: 1px solid rgba(255, 138, 31, 0.35);
+  color: var(--amber);
+}
+.buy-hero h1 {
+  margin: 18px 0 0;
+  font-size: 40px;
+  font-weight: 800;
+  line-height: 1.25;
+  color: #fff;
+  letter-spacing: -0.01em;
+}
+.buy-hero-sub {
+  margin: 10px 0 0;
+  max-width: 760px;
+  font-size: 16px;
+  line-height: 1.9;
+  color: #b9c6de; /* on-navy muted — matches .tile.navy .lbl */
+}
+
+/* ---- the inset demo-search card ---- */
+.buy-search {
+  margin-top: 22px;
+  border-radius: 16px;
+  padding: 16px 18px;
+  color: var(--ink);
+  box-shadow: var(--sh-md);
+}
+.buy-search-eyebrow {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  flex-wrap: wrap;
+}
+.buy-try {
+  font-size: 12.5px;
+  font-weight: 700;
+}
+.buy-search-row {
+  display: flex;
+  gap: 10px;
+  margin-top: 12px;
+}
+.buy-input {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  min-height: 52px;
+  padding: 0 14px;
+  border: 1px solid var(--line);
+  border-radius: 12px;
+  background: var(--card);
+  cursor: text;
+}
+.buy-input:focus-within {
+  border-color: var(--amber);
+  box-shadow: var(--focus);
+}
+.buy-input svg {
+  width: 18px;
+  height: 18px;
+  color: var(--faint);
+  flex: none;
+}
+.buy-input input {
+  flex: 1;
+  min-width: 0;
+  border: 0;
+  outline: none;
+  background: transparent;
+  font-family: var(--font-mono);
+  font-variant-numeric: tabular-nums;
+  font-size: 15px;
+  color: var(--ink);
+}
+.buy-input input::placeholder {
+  font-family: var(--font-sans);
+  color: var(--faint);
+}
+.buy-helper {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin: 10px 0 0;
+  font-size: 12.5px;
+  color: var(--muted);
+}
+.buy-helper svg {
+  width: 14px;
+  height: 14px;
+  color: var(--faint);
+  flex: none;
+}
+
+/* Result area: dashed empty/no-match state ⇄ the demo result card. */
+.buy-empty {
+  margin-top: 14px;
+  padding: 22px 16px;
+  border: 1.5px dashed var(--line);
+  border-radius: 12px;
+  text-align: center;
+  color: var(--faint);
+  font-size: 13.5px;
+  line-height: 1.8;
+}
+.buy-result {
+  margin-top: 14px;
+}
+.buy-result .ws-match {
+  margin-top: 0;
+  flex-wrap: wrap;
+}
+.buy-result .ws-match .pill {
+  margin-inline-start: auto;
+}
+.buy-note {
+  font-size: 11.5px;
+  text-align: center;
+  margin-top: 12px;
+}
+
+/* ---- section heads + benefit/method card grids ---- */
+.buy-sec-head {
+  display: flex;
+  align-items: baseline;
+  gap: 12px;
+  flex-wrap: wrap;
+  padding: 0 2px;
+}
+.buy-sec-head h2 {
+  margin: 0;
+  font-size: 18px;
+  font-weight: 800;
+  color: var(--navy-850);
+}
+.buy-sec-head .eyebrow {
+  font-size: 12.5px;
+  font-weight: 700;
+  color: var(--faint);
+}
+.buy-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+  gap: 16px;
+  margin-top: 12px;
+}
+.buy-card {
+  border-radius: 18px;
+  padding: 20px;
+}
+.buy-card-top {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 10px;
+}
+.buy-ic {
+  width: 42px;
+  height: 42px;
+  border-radius: 12px;
+  background: var(--amber-soft);
+  border: 1px solid var(--amber-line);
+  color: var(--amber-text);
+  display: grid;
+  place-items: center;
+  flex: none;
+}
+.buy-ic svg {
+  width: 21px;
+  height: 21px;
+}
+.buy-num {
+  width: 26px;
+  height: 26px;
+  border-radius: 50%;
+  background: var(--line-2);
+  color: var(--navy-850);
+  font-size: 13px;
+  font-weight: 800;
+  display: grid;
+  place-items: center;
+}
+.buy-card h3 {
+  margin: 14px 0 6px;
+  font-size: 15.5px;
+  font-weight: 800;
+  color: var(--navy-850);
+}
+.buy-card p {
+  margin: 0;
+  font-size: 13px;
+  line-height: 1.8;
+  color: var(--muted);
+}
+
+/* ---- the 5 buying steps (RTL: step 1 at the start/right, 5 navy) ---- */
+.buy-steps {
+  border-radius: 18px;
+  padding: 22px;
+}
+.buy-steps-row {
+  display: grid;
+  grid-template-columns: repeat(5, minmax(0, 1fr));
+  gap: 18px;
+  margin-top: 18px;
+}
+.buy-step .n {
+  width: 30px;
+  height: 30px;
+  border-radius: 50%;
+  background: var(--amber);
+  color: var(--navy-900);
+  font-size: 14px;
+  font-weight: 800;
+  display: grid;
+  place-items: center;
+}
+.buy-step.navy .n {
+  background: var(--navy-850);
+  color: #fff;
+}
+.buy-step h3 {
+  margin: 10px 0 5px;
+  font-size: 13.5px;
+  font-weight: 800;
+  color: var(--navy-850);
+}
+.buy-step p {
+  margin: 0;
+  font-size: 12px;
+  line-height: 1.75;
+  color: var(--muted);
+}
+
+/* ---- network banner + footer strip ---- */
+.buy-banner {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  padding: 16px 18px;
+  background: var(--amber-soft);
+  border: 1px solid var(--amber-line);
+  border-radius: 14px;
+}
+.buy-banner .buy-ic {
+  background: var(--card);
+}
+.buy-banner b {
+  display: block;
+  font-size: 14px;
+  color: var(--amber-text);
+}
+.buy-banner span:not(.buy-ic) {
+  display: block;
+  margin-top: 3px;
+  font-size: 12.5px;
+  color: #8a5a1e; /* matches .strip-amber */
+}
+.buy-foot {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  padding: 16px 18px;
+  border-radius: 14px;
+  border-inline-start: 3px solid var(--amber);
+  font-size: 13.5px;
+  font-weight: 700;
+  color: var(--navy-850);
+}
+
+@media (max-width: 900px) {
+  .buy-steps-row {
+    grid-template-columns: 1fr 1fr;
+  }
+}
+@media (max-width: 720px) {
+  .buy-hero {
+    padding: 24px 20px;
+  }
+  .buy-hero h1 {
+    font-size: 30px;
+  }
+  .buy-search-row {
+    flex-wrap: wrap;
+  }
+  .mode-seg button {
+    padding: 0 11px;
+  }
+}
+@media (max-width: 560px) {
+  .buy-steps-row {
+    grid-template-columns: 1fr;
+  }
+}

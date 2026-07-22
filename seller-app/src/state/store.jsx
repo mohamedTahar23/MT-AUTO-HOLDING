@@ -3,6 +3,16 @@ import { api } from '../api/index.js'
 
 const AppContext = createContext(null)
 
+const MODE_KEY = 'mtseller.mode' // persisted sell ⇄ buy header toggle
+
+function readMode() {
+  try {
+    return localStorage.getItem(MODE_KEY) === 'buy' ? 'buy' : 'sell'
+  } catch {
+    return 'sell'
+  }
+}
+
 /** Access the app store (session, shop, routing, toasts). */
 export function useApp() {
   const ctx = useContext(AppContext)
@@ -14,6 +24,7 @@ export function AppProvider({ children }) {
   const [session, setSession] = useState(() => api.currentSession())
   const [shop, setShop] = useState(null)
   const [route, setRoute] = useState({ name: 'queue', params: {} })
+  const [mode, setModeState] = useState(readMode)
   const [toasts, setToasts] = useState([])
   const toastId = useRef(0)
 
@@ -31,6 +42,15 @@ export function AppProvider({ children }) {
   }, [session, refreshShop])
 
   const navigate = useCallback((name, params = {}) => setRoute({ name, params }), [])
+
+  const setMode = useCallback((m) => {
+    setModeState(m)
+    try {
+      localStorage.setItem(MODE_KEY, m)
+    } catch {
+      /* storage blocked — mode still switches for the session */
+    }
+  }, [])
 
   const toast = useCallback((text, kind = 'info') => {
     const id = ++toastId.current
@@ -61,6 +81,8 @@ export function AppProvider({ children }) {
     refreshShop,
     route,
     navigate,
+    mode,
+    setMode,
     toast,
     toasts,
     signIn,

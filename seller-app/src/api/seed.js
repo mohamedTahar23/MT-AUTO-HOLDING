@@ -516,6 +516,23 @@ export const ads = [
   },
 ]
 
+// Wholesale demo catalog — powers the one interactive behavior of the Buy
+// (الشراء) coming-soon landing: the demo search. Each part is findable by its
+// official ref, any alias (old/short/abbreviated refs), its name, or a
+// compatible vehicle name. Figures are illustrative — the feature ships later.
+export const wholesaleDemo = [
+  {
+    ref: '24410-2M803',
+    aliases: ['2M803-24410', '2M810', '2R-2M803', 'TEN CH SPO'],
+    partName: 'Tendeur de chaîne',
+    vehicles: ['Sportage 5', 'Tucson', 'Seltos'],
+    suppliers: [
+      { brand: 'Mobis', origin: 'كوريا الجنوبية', range: '9 250 – 10 500 دج' },
+      { brand: 'KFM', origin: 'كوريا الجنوبية', range: '6 200 – 7 400 دج' },
+    ],
+  },
+]
+
 // Wilaya list for enrollment (subset of the 58 — enough for the picker).
 export const wilayas = [
   'عنابة', 'الطارف', 'قالمة', 'سكيكدة', 'سوق أهراس', 'قسنطينة', 'ميلة',

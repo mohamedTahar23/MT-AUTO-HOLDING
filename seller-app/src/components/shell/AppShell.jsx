@@ -11,6 +11,7 @@ import Performance from '../screens/Performance.jsx'
 import Messages from '../screens/Messages.jsx'
 import Feed from '../screens/Feed.jsx'
 import ComingSoon from '../screens/ComingSoon.jsx'
+import BuyLanding from '../buy/BuyLanding.jsx'
 
 const SCREENS = {
   queue: Queue,
@@ -25,16 +26,11 @@ const SOON_TITLES = {
   team: 'الفريق والصلاحيات',
   settings: 'إعدادات الحساب',
   activity: 'سجل نشاط الموظفين',
-  'proc-search': 'محرّك البحث عن قطع الجملة',
-  'proc-supply': 'التموين بأسعار الجملة',
-  'proc-submit': 'المشتريات — إرسال قائمة',
-  'proc-requests': 'المشتريات — طلباتي',
 }
 
 export default function AppShell() {
-  const { api, route, shop, isOwner, session } = useApp()
+  const { api, route, shop, isOwner, mode } = useApp()
   const [counts, setCounts] = useState({ queue: 0, quotes: 0, deliveries: 0 })
-  const [mode, setMode] = useState('sell')
 
   const loadCounts = useCallback(async () => {
     const [tasks, offers, orders] = await Promise.all([api.getTasks(), api.getOffers(), api.getOrders()])
@@ -53,11 +49,24 @@ export default function AppShell() {
   const Screen = SCREENS[route.name]
   const r2 = shop?.r2?.active
 
+  // Buy mode (header toggle) — the wholesale coming-soon landing, full width:
+  // a single page with no sidebar shell.
+  if (mode === 'buy') {
+    return (
+      <div className="shell">
+        <Header />
+        <main className="main buy-main">
+          <BuyLanding />
+        </main>
+      </div>
+    )
+  }
+
   return (
     <div className="shell">
       <Header />
       <div className="shell-body">
-        <Sidebar counts={counts} mode={mode} setMode={setMode} />
+        <Sidebar counts={counts} />
         <main className="main">
           <div className="main-inner">
             {!isOwner && (
