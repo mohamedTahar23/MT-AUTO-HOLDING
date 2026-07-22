@@ -10,12 +10,13 @@ export default function LandingHeader() {
         </div>
         <span style={{ marginInlineStart: 'auto' }} />
         <div className="lang-toggle" role="group" aria-label="اللغة">
-          {/* AR is the only language shipped in the design bundle — FR is pending content. */}
+          {/* AR is the only language shipped — FR is disabled until French content exists. */}
           <button type="button" className="on" aria-pressed="true">
             AR
           </button>
-          <button type="button" aria-pressed="false" title="Français — قريباً">
+          <button type="button" disabled title="Français — قريباً">
             FR
+            <span className="soon">قريباً</span>
           </button>
         </div>
         <button className="btn btn-amber-line btn-sm" onClick={scrollToSignin}>

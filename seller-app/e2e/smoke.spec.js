@@ -19,10 +19,12 @@ test('landing gate renders in Arabic RTL', async ({ page }) => {
 test('landing shows every design section top to bottom', async ({ page }) => {
   await page.goto('/')
 
-  // §1 header: FR/AR language toggle.
+  // §1 header: FR/AR language toggle — AR active, FR honestly disabled («قريباً»).
   const toggle = page.getByRole('group', { name: 'اللغة' })
   await expect(toggle.getByRole('button', { name: 'AR' })).toBeVisible()
   await expect(toggle.getByRole('button', { name: 'FR' })).toBeVisible()
+  await expect(toggle.getByRole('button', { name: 'FR' })).toBeDisabled()
+  await expect(toggle.getByText('قريباً')).toBeVisible()
 
   // §2 hero: example pricing card figures.
   await expect(page.getByText('Alternateur — Hyundai i10 2016')).toBeVisible()
@@ -44,7 +46,7 @@ test('landing shows every design section top to bottom', async ({ page }) => {
 
   // §6 سوق الجملة: قريباً + the search-engine example.
   await expect(page.getByRole('heading', { name: 'اشترِ بسعر الجملة الحقيقي.' })).toBeVisible()
-  await expect(page.getByText('قريباً', { exact: true })).toBeVisible()
+  await expect(page.locator('#wholesale').getByText('قريباً', { exact: true })).toBeVisible()
   await expect(page.getByText('Tendeur de chaîne')).toBeVisible()
   await expect(page.getByText('Mobis')).toBeVisible()
   await expect(page.getByText('KFM')).toBeVisible()

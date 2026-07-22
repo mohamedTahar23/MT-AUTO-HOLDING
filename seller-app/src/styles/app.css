@@ -1023,6 +1023,24 @@
   background: var(--navy-850);
   color: #fff;
 }
+/* FR is not available yet — honest disabled state, not a dead button. */
+.lang-toggle button:disabled {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  color: var(--faint);
+  cursor: not-allowed;
+}
+.lang-toggle .soon {
+  font-size: 9px;
+  font-weight: 800;
+  line-height: 1.5;
+  padding: 0 6px;
+  border-radius: 999px;
+  background: var(--amber-soft);
+  color: var(--amber-text);
+  border: 1px solid var(--amber-line);
+}
 /* amber-tinted outline pill (header sign-in) */
 .btn-amber-line {
   background: var(--amber-soft);
