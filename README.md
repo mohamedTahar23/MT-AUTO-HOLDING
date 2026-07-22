@@ -1,5 +1,7 @@
 # MT AUTO — Holding
 
+[![CI](https://github.com/mohamedTahar23/MT-AUTO-HOLDING/actions/workflows/ci.yml/badge.svg)](https://github.com/mohamedTahar23/MT-AUTO-HOLDING/actions/workflows/ci.yml)
+
 This repository holds the multiple **MT AUTO** web portals — the front-ends of a
 reverse marketplace for car parts in Algeria run by
 «محل محمد الطاهر لبيع قطع غيار السيارات» (El Hadjar, Annaba). Each app is a
