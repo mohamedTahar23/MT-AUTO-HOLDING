@@ -66,7 +66,9 @@ export default function Queue({ onData }) {
             <Pill tone="amber" dot>
               مطلوب فيديو
             </Pill>
-            <div className="grow">
+            {/* min-width forces a real wrap on phones — flex:1 alone would let
+                the text column squeeze to a sliver beside the CTA instead. */}
+            <div className="grow" style={{ minWidth: 200 }}>
               <div className="row center wrap" style={{ gap: 8 }}>
                 <b>{videoOrder.partName}</b>
                 <span style={{ fontWeight: 800, color: 'var(--navy-850)' }}>

@@ -2928,3 +2928,132 @@
 .perm-switch.on .perm-knob {
   inset-inline-start: 21px;
 }
+
+/* ============================================================================
+   Mobile shell — phone-width fixes. The shell header must NEVER overflow the
+   viewport: in RTL any horizontal overflow shifts the whole page leftward and
+   mis-anchors every fixed overlay (account popup, toasts). The ≤900px sidebar
+   removal gets a bottom tab bar (.mnav) as its replacement. Tokens only.
+   ========================================================================== */
+
+/* The hero example card: badges never break mid-reference; the head row wraps
+   as a whole instead (this also fixes narrow webviews with boosted fonts). */
+.hero-card .row {
+  flex-wrap: wrap;
+  row-gap: 6px;
+}
+.hero-card .pill,
+.hero-card .chip {
+  white-space: nowrap;
+}
+
+/* Bottom tab bar — hidden on desktop, shown wherever the sidebar is hidden. */
+.mnav {
+  display: none;
+}
+
+@media (max-width: 900px) {
+  .shell-head {
+    padding: 0 12px;
+    gap: 10px;
+  }
+  .main {
+    padding: 20px 14px 96px; /* bottom clears the tab bar */
+  }
+  .mnav {
+    position: fixed;
+    inset-inline: 0;
+    bottom: 0;
+    z-index: 45; /* above the header (40), below modal scrims (60/80) */
+    display: flex;
+    background: var(--card);
+    border-top: 1px solid var(--line);
+    padding: 6px 8px calc(6px + env(safe-area-inset-bottom, 0px));
+  }
+  .mnav button {
+    position: relative;
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 3px;
+    border: 0;
+    border-radius: 10px;
+    background: transparent;
+    font-family: inherit;
+    font-size: 11px;
+    font-weight: 800;
+    color: var(--muted);
+    padding: 6px 2px 4px;
+    cursor: pointer;
+  }
+  .mnav button.active {
+    color: var(--amber-text);
+    background: var(--amber-soft);
+  }
+  .mnav button svg {
+    width: 20px;
+    height: 20px;
+  }
+  .mnav .count {
+    position: absolute;
+    top: 0;
+    inset-inline-start: 50%;
+    margin-inline-start: 8px;
+    min-width: 18px;
+    height: 17px;
+    padding: 0 5px;
+    border-radius: var(--pill);
+    font-size: 10.5px;
+    font-weight: 800;
+    display: grid;
+    place-items: center;
+    font-variant-numeric: tabular-nums;
+  }
+}
+
+@media (max-width: 560px) {
+  /* Signed-in header: logo-only brand + avatar-only account chip. */
+  .shell-head .brand {
+    font-size: 0;
+    gap: 0;
+  }
+  .shell-head .brand .logo {
+    font-size: 14px;
+  }
+  .acct-btn > span:not(.avatar) {
+    display: none;
+  }
+  .acct-btn {
+    padding: 4px;
+  }
+  /* Landing header: tighter paddings so brand + toggle + sign-in fit 360px. */
+  .land-head .wrap {
+    padding: 0 14px;
+  }
+  .lang-toggle button {
+    padding: 4px 8px;
+  }
+  .fab-wa {
+    width: 48px;
+    height: 48px;
+    font-size: 22px;
+  }
+  /* Account popup: use nearly the whole phone screen. */
+  .blur-scrim {
+    padding: 10px;
+  }
+  .blur-modal {
+    max-height: 94vh;
+  }
+  .blur-head {
+    padding: 14px 16px;
+  }
+  .blur-body {
+    padding: 16px;
+  }
+  .blur-foot {
+    padding: 12px 16px;
+    flex-wrap: wrap;
+  }
+}
