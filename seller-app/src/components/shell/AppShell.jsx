@@ -9,7 +9,6 @@ import Deliveries from '../screens/Deliveries.jsx'
 import Payouts from '../screens/Payouts.jsx'
 import Performance from '../screens/Performance.jsx'
 import Messages from '../screens/Messages.jsx'
-import Feed from '../screens/Feed.jsx'
 import ComingSoon from '../screens/ComingSoon.jsx'
 import BuyLanding from '../buy/BuyLanding.jsx'
 
@@ -23,7 +22,6 @@ const SCREENS = {
   payouts: Payouts,
   performance: Performance,
   messages: Messages,
-  feed: Feed,
 }
 
 export default function AppShell() {

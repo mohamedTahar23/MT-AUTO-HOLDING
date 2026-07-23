@@ -3,8 +3,7 @@ import { useApp } from '../../state/store.jsx'
 import AccountModal from '../account/AccountModal.jsx'
 
 export default function Header() {
-  const { shop, session, isOwner, signOut, navigate, mode, setMode, accountModal, openAccountModal, closeAccountModal } =
-    useApp()
+  const { shop, session, isOwner, signOut, mode, setMode, accountModal, openAccountModal, closeAccountModal } = useApp()
   const [open, setOpen] = useState(false)
   const acctBtnRef = useRef(null) // popup close returns focus here
   const name = shop?.name || 'المحل'
@@ -61,19 +60,6 @@ export default function Header() {
             <circle cx="17.5" cy="20" r="1.4" fill="currentColor" />
           </svg>
           الشراء
-        </button>
-      </div>
-
-      <div className="acct">
-        <button
-          className="bell"
-          title="الإشعارات"
-          onClick={() => {
-            setMode('sell')
-            navigate('feed')
-          }}
-        >
-          🔔<span className="badge">2</span>
         </button>
       </div>
 

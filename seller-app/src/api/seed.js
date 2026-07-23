@@ -516,22 +516,6 @@ export const messages = [
   { id: 'm3', from: 'MT', at: mins(80), text: 'سيُحرَّر المبلغ تلقائياً بعد تأكيد التسليم. طلب MT-10422 قيد الشحن حالياً.' },
 ]
 
-// Announcements — read-only (إعلانات MT).
-export const announcements = [
-  {
-    id: 'a1',
-    at: mins(2880),
-    title: 'تحديث نافذة سحب العرض',
-    body: 'يمكنكم سحب أي عرض مجاناً خلال 15 دقيقة من إرساله. بعد ذلك يُحتسب السحب متأخراً.',
-  },
-  {
-    id: 'a2',
-    at: mins(7200),
-    title: 'الناقل الجديد: YAL',
-    body: 'أصبح تسليم الطرود عبر شركة YAL. سلّموا الطرد المُعمّى للناقل مع ذكر رمز الملصق و«MT AUTO».',
-  },
-]
-
 // Country-of-manufacture options (بلد الصنع) for the offer modal.
 export const countries = [
   'ألمانيا', 'فرنسا', 'إيطاليا', 'إسبانيا', 'اليابان', 'كوريا الجنوبية',
