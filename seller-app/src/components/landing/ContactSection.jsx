@@ -1,18 +1,5 @@
-import { useRef, useState } from 'react'
-
-/** §8 — contact: address / phone / directions card + the map-image drop placeholder. */
+/** §8 — contact: address / phone / directions card. */
 export default function ContactSection() {
-  const [mapSrc, setMapSrc] = useState(null)
-  const inputRef = useRef(null)
-
-  // Client-side-only preview — nothing is uploaded anywhere (no backend on the landing).
-  function onFile(file) {
-    if (!file || !file.type.startsWith('image/')) return
-    const reader = new FileReader()
-    reader.onload = () => setMapSrc(reader.result)
-    reader.readAsDataURL(file)
-  }
-
   return (
     <section className="land-sec land-sec--white" id="contact">
       <div className="wrap contact-grid">
@@ -60,38 +47,6 @@ export default function ContactSection() {
             احصل على الاتجاهات
           </a>
         </div>
-
-        <label
-          className={`map-drop ${mapSrc ? 'has-img' : ''}`}
-          onDragOver={(e) => e.preventDefault()}
-          onDrop={(e) => {
-            e.preventDefault()
-            onFile(e.dataTransfer.files?.[0])
-          }}
-        >
-          <input
-            ref={inputRef}
-            type="file"
-            accept="image/*"
-            hidden
-            onChange={(e) => onFile(e.target.files?.[0])}
-          />
-          {mapSrc ? (
-            <img src={mapSrc} alt="خريطة الموقع" />
-          ) : (
-            <>
-              <svg viewBox="0 0 24 24" fill="none" aria-hidden>
-                <rect x="3.5" y="4.5" width="17" height="15" rx="2.5" stroke="currentColor" strokeWidth="1.6" />
-                <circle cx="9" cy="10" r="1.8" stroke="currentColor" strokeWidth="1.6" />
-                <path d="M5 18l4.5-4.5 3 3L17 12l3 3.5" stroke="currentColor" strokeWidth="1.6" strokeLinejoin="round" />
-              </svg>
-              <span>ألقِ صورة خريطة الموقع هنا</span>
-              <small>
-                or <u>browse files</u>
-              </small>
-            </>
-          )}
-        </label>
       </div>
     </section>
   )
