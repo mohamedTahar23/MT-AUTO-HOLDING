@@ -163,3 +163,22 @@ All three steps render inside `AccountSection.jsx` under a 3-node stepper;
   proxy to the Claude API — never call it with an API key from the browser; the
   full Arabic system prompt is preserved in the design bundle (see the
   BUYER-APP.md mock table). WhatsApp escalation links are live.
+
+## Dev mode (browse-anywhere)
+
+- **Shown when:** the dev flag is on — [`DevPanel.jsx`](../src/components/DevPanel.jsx)
+  renders `null` otherwise. **Off by default**, so it never affects the product
+  or the e2e suite.
+- **Enable / disable:** `?dev` (or `?dev=1`) in the URL, `?dev=0` to turn off,
+  or the **Ctrl/⌘+Shift+D** shortcut. The choice persists in `localStorage`
+  (`mt.devmode`). State + hook live in [`devmode.js`](../src/devmode.js).
+- **What it does:** turning it on auto-logs-in the demo account (no OTP) and
+  drops the wizard validation gates — in `App.jsx` `vm.vehDisabled` /
+  `partNextDisabled` / `reviewDisabled` are forced `false` when `dev`, so the
+  real «تابع» / «مراجعة» buttons work with empty fields. The floating panel then
+  jumps to any wizard step (`devGo` — vehicle / part / details / sent) or opens
+  any overlay (`طلباتي`, `حسابي`, `تواصل`, `الشروط`, `المساعد`) through the same
+  handlers the product uses — it is not a parallel code path, it only skips the
+  gates.
+- **Reads / mutations:** `s.loggedIn`, `s.step`; `devLogin`, `devGo`, `logout`,
+  and the existing modal openers (all on the `app` prop bag).

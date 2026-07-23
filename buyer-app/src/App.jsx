@@ -1,4 +1,4 @@
-import { useState, useRef, useMemo, useCallback } from 'react'
+import { useState, useRef, useMemo, useCallback, useEffect } from 'react'
 import {
   SAVED_VEHICLES, SAVED_PROFILE, ACCT_ORDERS, BSTAT, WILAYAS,
   MAINT_RE, WHATSAPP, phoneOk, onlyDigits, newCode, genOrder,
@@ -11,6 +11,8 @@ import Footer from './components/Footer.jsx'
 import { ContactModal, TermsModal, AccountModal, EditProfileModal } from './components/Modals.jsx'
 import OrdersHub from './components/OrdersHub.jsx'
 import Assistant from './components/Assistant.jsx'
+import DevPanel from './components/DevPanel.jsx'
+import { useDevMode } from './devmode.js'
 
 const OTP_LEN = 6
 
@@ -40,6 +42,7 @@ export default function App() {
   const [s, setS] = useState(INITIAL)
   const patch = useCallback((p) => setS((prev) => ({ ...prev, ...(typeof p === 'function' ? p(prev) : p) })), [])
   const timers = useRef({})
+  const [dev] = useDevMode()
 
   // ---------- login ----------
   const onLoginPhone = (e) => patch({ loginPhone: onlyDigits(e.target.value, 10) })
@@ -49,8 +52,8 @@ export default function App() {
   }
   const onLoginInput = (e) => patch({ loginInput: onlyDigits(e.target.value, OTP_LEN) })
   const backLoginPhone = () => patch({ loginStage: 'phone', loginInput: '' })
-  const loginVerify = () => {
-    if ((s.loginInput || '').length < 4) return
+  // Log in + seed the demo account. Shared by the real OTP flow and dev mode.
+  const applyLogin = () => {
     const v = SAVED_VEHICLES[0]
     patch((prev) => ({
       loggedIn: true, step: 'vehicle',
@@ -60,9 +63,27 @@ export default function App() {
       savedVeh: true, autofilled: true, make: v.make, model: v.model, year: v.year, fuel: v.fuel,
       orders: prev.orders.length ? prev.orders : ACCT_ORDERS.slice(),
     }))
+  }
+  const loginVerify = () => {
+    if ((s.loginInput || '').length < 4) return
+    applyLogin()
     scrollToAccount()
   }
   const logout = () => patch({ ...INITIAL })
+
+  // ---------- dev mode ----------
+  // Log in with no OTP, then jump to any wizard step without filling fields.
+  const devLogin = () => { applyLogin(); scrollToAccount() }
+  const devGo = (step) => {
+    if (!s.loggedIn) applyLogin()
+    if (step === 'sent') patch((p) => ({ orderNum: p.orderNum || genOrder() }))
+    go(step)
+  }
+  // Auto-login the first time dev mode turns on so the wizard is reachable.
+  useEffect(() => {
+    if (dev && !s.loggedIn) devLogin()
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [dev])
 
   // ---------- navigation ----------
   const scrollToAccount = () => setTimeout(() => {
@@ -198,7 +219,7 @@ export default function App() {
       carStepCls: 'oflow-step ' + (s.step === 'vehicle' ? 'on' : 'done'),
       partStepCls: 'oflow-step ' + (s.step === 'part' ? 'on' : (s.step === 'details' || s.step === 'sent' ? 'done' : '')),
       detStepCls: 'oflow-step ' + (s.step === 'details' ? 'on' : (s.step === 'sent' ? 'done' : '')),
-      vehDisabled: !vehicleOk(), partNextDisabled: !partOk(), reviewDisabled: !(detailsOk() && partOk()),
+      vehDisabled: dev ? false : !vehicleOk(), partNextDisabled: dev ? false : !partOk(), reviewDisabled: dev ? false : !(detailsOk() && partOk()),
       addPartDisabled: !s.pName.trim() && s.pPhotos <= 0, canAddPhoto: s.pPhotos < 4, vinHasValue: dvin.length > 0,
       hasSavedVehicles: SAVED_VEHICLES.length > 0,
       savedVehicles: SAVED_VEHICLES.map((v) => {
@@ -234,7 +255,7 @@ export default function App() {
       showSuggestions: s.chatMessages.length <= 1 && !s.chatSending,
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [s])
+  }, [s, dev])
 
   const app = {
     s, vm, WILAYAS, WHATSAPP, OTP_LEN,
@@ -246,6 +267,7 @@ export default function App() {
     openHub, closeHub, openOrderJourney, closeOrderJourney, reorderOrder,
     toggleMenu, closeMenu, openContact, closeContact, openTerms, closeTerms,
     toggleChat, onChatInput, sendChat,
+    devLogin, devGo,
   }
 
   return (
@@ -263,6 +285,7 @@ export default function App() {
       <EditProfileModal app={app} />
       {s.hubOpen && <OrdersHub app={app} />}
       <Assistant app={app} />
+      <DevPanel app={app} />
     </div>
   )
 }

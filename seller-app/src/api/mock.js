@@ -387,4 +387,15 @@ export const mockApi = {
       : { active: false, reason: '' }
     return clone(db.shop)
   },
+
+  // Dev-mode helper: sign in as any seeded user without OTP, so DevPanel can
+  // land straight in the shell. Mock-only (the `_` prefix marks it as such) —
+  // the real adapter never fabricates a session client-side.
+  async _devSignIn(userId = 'u_owner') {
+    const user = db.users.find((u) => u.id === userId) || db.users[0]
+    if (db.shop.status !== 'active') db.shop.status = 'active' // skip the review gate
+    writeSession({ shopId: db.shop.id, user, email: user.email })
+    logEvent('login', `dev:${user.email}`)
+    return { session: clone(session), shop: clone(db.shop) }
+  },
 }

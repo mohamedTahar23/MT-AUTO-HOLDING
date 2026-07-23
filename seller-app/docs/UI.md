@@ -286,6 +286,30 @@ only the Settings section has footer actions.
 
 ---
 
+## Dev mode (browse-anywhere)
+
+- **Shown when:** the dev flag is on —
+  [`components/dev/DevPanel.jsx`](../src/components/dev/DevPanel.jsx) renders
+  `null` otherwise. **Off by default**, so it never affects the product or the
+  e2e suite.
+- **Enable / disable:** `?dev` (or `?dev=1`) in the URL, `?dev=0` to turn off,
+  or the **Ctrl/⌘+Shift+D** shortcut. The choice persists in `localStorage`
+  (`mtseller.devmode`). State + hook live in
+  [`lib/devmode.js`](../src/lib/devmode.js).
+- **What it does:** the floating panel signs in without OTP (as owner `u_owner`
+  or employee `u_emp_1`) via the mock-only `api._devSignIn(userId)` helper — a
+  `_`-prefixed debug method alongside `_debugSetR2`, feature-detected so the real
+  adapter (which never fabricates a session client-side) simply hides those
+  buttons. It then drives the store's own `navigate` to reach every routed screen
+  (including `performance` / `messages`, which the sidebar doesn't list),
+  `openAccountModal` for the owner popups, `setMode` for buy ⇄ sell, and
+  `_debugSetR2` + `refreshShop` to toggle the R2 restriction. No parallel code
+  path — it calls the same store actions the product does.
+- **Reads / mutations:** `session`, `route`, `mode`, `shop.r2`; store `signIn`,
+  `signOut`, `navigate`, `openAccountModal`, `setMode`, `refreshShop`.
+
+---
+
 ## E2E coverage
 
 Two Playwright projects (see `playwright.config.js`): desktop Chrome runs
