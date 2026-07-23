@@ -24,6 +24,10 @@ export function AppProvider({ children }) {
   const [session, setSession] = useState(() => api.currentSession())
   const [shop, setShop] = useState(null)
   const [route, setRoute] = useState({ name: 'queue', params: {} })
+  // Owner "Account area" popup — null | 'settings' | 'team' | 'activity'.
+  // These sections are modals over the current view, never routed screens.
+  const [accountModal, setAccountModal] = useState(null)
+  const accountModalPushed = useRef(false) // did we pushState for the open modal?
   const [mode, setModeState] = useState(readMode)
   const [toasts, setToasts] = useState([])
   const toastId = useRef(0)
@@ -42,6 +46,46 @@ export function AppProvider({ children }) {
   }, [session, refreshShop])
 
   const navigate = useCallback((name, params = {}) => setRoute({ name, params }), [])
+
+  // Open one account section as a popup. Owner-only — staff calls are ignored
+  // (their menu never offers these, this guards programmatic opens too).
+  const openAccountModal = useCallback(
+    (name) => {
+      if (session?.user?.role !== 'owner') return
+      setAccountModal(name)
+      window.history.pushState({ accountModal: name }, '')
+      accountModalPushed.current = true
+    },
+    [session],
+  )
+
+  // Closing goes through history.back() when we pushed an entry, so ✕/Esc/
+  // backdrop and the browser Back button all land on the same popstate path.
+  // The flag clears BEFORE back(): popstate is async, and a second close
+  // trigger in that window must not issue a second back() (it would traverse
+  // past the app's only entry and leave the SPA).
+  const closeAccountModal = useCallback(() => {
+    if (accountModalPushed.current) {
+      accountModalPushed.current = false
+      window.history.back()
+    } else {
+      setAccountModal(null)
+    }
+  }, [])
+
+  useEffect(() => {
+    // Follow the entry's own state rather than blindly closing: Back lands on
+    // the base entry (state null → closed) and Forward can land back on a
+    // modal entry (→ reopen), so the buttons never hit dead entries.
+    const onPop = (e) => {
+      const name = e.state?.accountModal
+      const valid = name === 'settings' || name === 'team' || name === 'activity' ? name : null
+      accountModalPushed.current = Boolean(valid)
+      setAccountModal(valid)
+    }
+    window.addEventListener('popstate', onPop)
+    return () => window.removeEventListener('popstate', onPop)
+  }, [])
 
   const setMode = useCallback((m) => {
     setModeState(m)
@@ -70,6 +114,7 @@ export function AppProvider({ children }) {
     await api.signOut()
     setSession(null)
     setShop(null)
+    setAccountModal(null)
   }, [])
 
   const value = {
@@ -81,6 +126,9 @@ export function AppProvider({ children }) {
     refreshShop,
     route,
     navigate,
+    accountModal,
+    openAccountModal,
+    closeAccountModal,
     mode,
     setMode,
     toast,

@@ -10,10 +10,12 @@ import Payouts from '../screens/Payouts.jsx'
 import Performance from '../screens/Performance.jsx'
 import Messages from '../screens/Messages.jsx'
 import Feed from '../screens/Feed.jsx'
-import Activity from '../screens/Activity.jsx'
 import ComingSoon from '../screens/ComingSoon.jsx'
 import BuyLanding from '../buy/BuyLanding.jsx'
 
+// Full-page sell-dashboard screens only. The owner account area (settings /
+// team / activity) is NOT routed — it opens as a blurred popup from the header
+// account menu (store.accountModal → AccountModal).
 const SCREENS = {
   queue: Queue,
   quotes: MyOffers,
@@ -22,14 +24,6 @@ const SCREENS = {
   performance: Performance,
   messages: Messages,
   feed: Feed,
-  activity: Activity,
-}
-// Screens only the owner may open — staff routed here land back on the queue
-// (their only nav surfaces already hide these, this guards programmatic nav).
-const OWNER_ONLY = new Set(['activity'])
-const SOON_TITLES = {
-  team: 'الفريق والصلاحيات',
-  settings: 'إعدادات الحساب',
 }
 
 export default function AppShell() {
@@ -50,8 +44,7 @@ export default function AppShell() {
     loadCounts()
   }, [route.name, loadCounts])
 
-  const routeName = OWNER_ONLY.has(route.name) && !isOwner ? 'queue' : route.name
-  const Screen = SCREENS[routeName]
+  const Screen = SCREENS[route.name]
   const r2 = shop?.r2?.active
 
   // Buy mode (header toggle) — the wholesale coming-soon landing, full width:
@@ -82,11 +75,7 @@ export default function AppShell() {
             )}
             {r2 && <R2Banner reason={shop.r2.reason} />}
 
-            {Screen ? (
-              <Screen onData={loadCounts} />
-            ) : (
-              <ComingSoon title={SOON_TITLES[route.name] || 'قريباً'} />
-            )}
+            {Screen ? <Screen onData={loadCounts} /> : <ComingSoon title="قريباً" />}
           </div>
         </main>
       </div>
