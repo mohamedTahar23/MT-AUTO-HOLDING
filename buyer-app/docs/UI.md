@@ -166,12 +166,16 @@ All three steps render inside `AccountSection.jsx` under a 3-node stepper;
 
 ## Dev mode (browse-anywhere)
 
-- **Shown when:** the dev flag is on — [`DevPanel.jsx`](../src/components/DevPanel.jsx)
-  renders `null` otherwise. **Off by default**, so it never affects the product
-  or the e2e suite.
-- **Enable / disable:** `?dev` (or `?dev=1`) in the URL, `?dev=0` to turn off,
-  or the **Ctrl/⌘+Shift+D** shortcut. The choice persists in `localStorage`
-  (`mt.devmode`). State + hook live in [`devmode.js`](../src/devmode.js).
+- **Shown when:** a 🛠️ launcher pinned to the inline-start edge (vertically
+  centred) is **always visible** — [`DevPanel.jsx`](../src/components/DevPanel.jsx).
+  Clicking it switches dev mode **on**; the dev behaviours (auto-login, dropped
+  gates, full panel) stay **off until that click**, so the launcher's presence is
+  the only change to a normal visit and the e2e suite (which never clicks it) is
+  unaffected.
+- **Enable / disable:** click the launcher, or `?dev` (`?dev=1`) in the URL /
+  `?dev=0` to force off, or the **Ctrl/⌘+Shift+D** shortcut. The choice persists
+  in `localStorage` (`mt.devmode`). State + hook live in
+  [`devmode.js`](../src/devmode.js).
 - **What it does:** turning it on auto-logs-in the demo account (no OTP) and
   drops the wizard validation gates — in `App.jsx` `vm.vehDisabled` /
   `partNextDisabled` / `reviewDisabled` are forced `false` when `dev`, so the
