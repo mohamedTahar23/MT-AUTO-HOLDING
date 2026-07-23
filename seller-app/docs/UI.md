@@ -41,6 +41,10 @@ Any 6-digit OTP verifies; any other email routes to the join-request form.
 - **Rules:** email format is validated inline; every valid email advances to the
   OTP screen — whether it belongs to a registered seller is resolved at verify
   time.
+- **Floating support:** a fixed WhatsApp FAB (`.fab-wa`, bottom-inline-end) opens
+  `wa.me/213659401338` — the WhatsApp glyph on a brand-green circle with a soft
+  attention halo and hover lift. Styled in `app.css`; the pulse self-disables
+  under `prefers-reduced-motion` (handled globally in `tokens.css`).
 - **Gaps:** the FR side of the language toggle is disabled with a «قريباً» badge.
 
 ### OTP screen
