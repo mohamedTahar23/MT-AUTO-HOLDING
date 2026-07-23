@@ -2655,9 +2655,6 @@
   font-weight: 800;
   border-bottom: 1px solid var(--line);
 }
-.act-head .act-time {
-  font-size: 11px;
-}
 .act-main {
   flex: 1;
   min-width: 0;
