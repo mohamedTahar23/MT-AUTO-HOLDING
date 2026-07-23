@@ -3,6 +3,7 @@ import AuthFlow from './components/auth/AuthFlow.jsx'
 import UnderReview from './components/auth/UnderReview.jsx'
 import AppShell from './components/shell/AppShell.jsx'
 import Toaster from './components/ui/Toaster.jsx'
+import DevPanel from './components/dev/DevPanel.jsx'
 
 function Root() {
   const { session, shop } = useApp()
@@ -17,6 +18,7 @@ function Root() {
     <>
       {view}
       <Toaster />
+      <DevPanel />
     </>
   )
 }
