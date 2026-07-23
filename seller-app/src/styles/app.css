@@ -1382,9 +1382,9 @@
 /* §8 contact */
 .contact-grid {
   display: grid;
-  grid-template-columns: 0.9fr 1.1fr;
-  gap: 22px;
-  align-items: stretch;
+  grid-template-columns: 1fr;
+  max-width: 620px;
+  margin-inline: auto;
 }
 .contact-card .crow > div {
   display: flex;
@@ -1503,8 +1503,7 @@
 
 @media (max-width: 900px) {
   .hero,
-  .split,
-  .contact-grid {
+  .split {
     grid-template-columns: 1fr;
   }
   .hero h1 {

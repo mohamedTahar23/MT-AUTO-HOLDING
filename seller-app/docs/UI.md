@@ -41,8 +41,7 @@ Any 6-digit OTP verifies; any other email routes to the join-request form.
 - **Rules:** email format is validated inline; every valid email advances to the
   OTP screen — whether it belongs to a registered seller is resolved at verify
   time.
-- **Gaps:** the FR side of the language toggle is disabled with a «قريباً» badge;
-  the contact map drop-area previews client-side only (nothing uploads).
+- **Gaps:** the FR side of the language toggle is disabled with a «قريباً» badge.
 
 ### OTP screen
 
