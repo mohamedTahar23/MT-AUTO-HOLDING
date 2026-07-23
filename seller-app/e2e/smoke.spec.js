@@ -541,14 +541,17 @@ test('activity log: owner opens it from the account menu — ≥6 attributed row
 }) => {
   await signInAs(page, 'owner@alamine-parts.dz')
 
-  // Reachable via the header account menu (owner section).
+  // Reachable via the header account menu (owner section) — opens as the
+  // blurred account popup, not a routed screen.
   await page.locator('.acct-btn').click()
   await page.getByRole('button', { name: /سجل نشاط الموظفين/ }).click()
 
+  const modal = page.getByTestId('account-modal')
+  await expect(modal).toBeVisible()
   const screen = page.getByTestId('activity-screen')
   await expect(screen).toBeVisible()
   await expect(page.getByRole('heading', { name: 'سجل نشاط الموظفين' })).toBeVisible()
-  await expect(screen).toContainText('كل إجراء يقوم به موظفوك يُنسَب إلى صاحبه')
+  await expect(modal).toContainText('كل إجراء يقوم به موظفوك يُنسَب إلى صاحبه')
 
   // Column header row + at least 6 attributed rows.
   await expect(screen.getByText('الموظف والإجراء')).toBeVisible()
@@ -585,4 +588,129 @@ test('activity log: staff cannot reach it — no menu entry, the screen never re
   // And the screen itself is nowhere in the DOM.
   await expect(page.getByTestId('activity-screen')).toHaveCount(0)
   await expect(page.getByTestId('activity-row')).toHaveCount(0)
+})
+
+// ---- Account area popups (settings / team / activity as blurred modals) -----
+
+async function openAccountSection(page, menuTestid) {
+  await signInAs(page, 'owner@alamine-parts.dz')
+  await page.locator('.acct-btn').click()
+  await page.getByTestId(menuTestid).click()
+  await expect(page.getByTestId('account-modal')).toBeVisible()
+}
+
+test('account popup: menu-team opens the team section over the dashboard, Esc closes and returns focus', async ({
+  page,
+}) => {
+  await openAccountSection(page, 'menu-team')
+
+  // The team section renders INSIDE the modal body; the dashboard never routed
+  // away — the queue heading is still behind the backdrop.
+  const modal = page.getByTestId('account-modal')
+  await expect(modal).toHaveAttribute('aria-modal', 'true')
+  await expect(page.getByTestId('team-screen')).toBeVisible()
+  await expect(page.getByRole('heading', { name: 'طابور التسعير' })).toBeVisible()
+
+  // Body scroll is locked while the popup is open.
+  expect(await page.evaluate(() => document.body.style.overflow)).toBe('hidden')
+
+  // Esc closes it, unlocks scroll, and focus returns to the account trigger.
+  await page.keyboard.press('Escape')
+  await expect(modal).toHaveCount(0)
+  expect(await page.evaluate(() => document.body.style.overflow)).not.toBe('hidden')
+  await expect(page.locator('.acct-btn')).toBeFocused()
+  await expect(page.getByRole('heading', { name: 'طابور التسعير' })).toBeVisible()
+})
+
+test('account popup: backdrop click closes it, clicks inside the panel do not', async ({ page }) => {
+  await openAccountSection(page, 'menu-team')
+
+  // Clicking inside the panel (its title) must NOT close the popup.
+  await page.locator('#account-modal-title').click()
+  await expect(page.getByTestId('account-modal')).toBeVisible()
+
+  // Clicking the blurred backdrop itself (viewport corner) closes it.
+  await page.getByTestId('account-modal-backdrop').click({ position: { x: 8, y: 8 } })
+  await expect(page.getByTestId('account-modal')).toHaveCount(0)
+})
+
+test('account popup: rapid double Esc closes once and never navigates the app away', async ({ page }) => {
+  await openAccountSection(page, 'menu-settings')
+
+  // Two Escapes in quick succession must collapse into ONE history.back() —
+  // a second traversal would exit the SPA entirely.
+  await page.keyboard.press('Escape')
+  await page.keyboard.press('Escape')
+  await expect(page.getByTestId('account-modal')).toHaveCount(0)
+  await expect(page.getByRole('heading', { name: 'طابور التسعير' })).toBeVisible()
+  expect(new URL(page.url()).pathname).toBe('/')
+})
+
+test('account popup: the ✕ button and browser Back both close it without leaving the app', async ({ page }) => {
+  await openAccountSection(page, 'menu-activity')
+  await page.getByTestId('account-modal-close').click()
+  await expect(page.getByTestId('account-modal')).toHaveCount(0)
+
+  // Reopen, then the browser Back button closes the popup (pushState pairing).
+  await page.locator('.acct-btn').click()
+  await page.getByTestId('menu-activity').click()
+  await expect(page.getByTestId('account-modal')).toBeVisible()
+  await page.goBack()
+  await expect(page.getByTestId('account-modal')).toHaveCount(0)
+  await expect(page.getByRole('heading', { name: 'طابور التسعير' })).toBeVisible()
+})
+
+test('account popup: settings renders its cards, save lives in the pinned footer and enables only when dirty', async ({
+  page,
+}) => {
+  await openAccountSection(page, 'menu-settings')
+  await expect(page.getByTestId('settings-screen')).toBeVisible()
+
+  // The three cards: store info, map, account & login.
+  await expect(page.getByText('معلومات المتجر')).toBeVisible()
+  await expect(page.getByText('موقع المحل على الخريطة')).toBeVisible()
+  await expect(page.getByText('الحساب والدخول')).toBeVisible()
+
+  // Save/reset live in the modal FOOTER (not the scrolling body), disabled while clean.
+  const save = page.locator('.blur-foot').getByTestId('settings-save')
+  const reset = page.locator('.blur-foot').getByTestId('settings-reset')
+  await expect(save).toBeVisible()
+  await expect(save).toBeDisabled()
+  await expect(reset).toBeDisabled()
+
+  // Editing a field arms them; reset returns to the clean state.
+  await page.getByTestId('settings-name').fill('قطع غيار الأمين — الفرع الرئيسي')
+  await expect(save).toBeEnabled()
+  await expect(reset).toBeEnabled()
+  await reset.click()
+  await expect(page.getByTestId('settings-name')).toHaveValue('قطع غيار الأمين')
+  await expect(save).toBeDisabled()
+
+  // Saving a real change persists it (header shop name re-renders) and disarms.
+  await page.getByTestId('settings-name').fill('قطع غيار الأمين الجديد')
+  await save.click()
+  await expect(save).toBeDisabled()
+  await expect(page.getByTestId('settings-name')).toHaveValue('قطع غيار الأمين الجديد')
+})
+
+test('account popup: team section invites a seat and toggles per-seat permission switches', async ({ page }) => {
+  await openAccountSection(page, 'menu-team')
+
+  // Seed team: the owner seat is fixed; employees expand to their switches.
+  await expect(page.getByTestId('team-row-u_owner')).toContainText('المالك — كل الصلاحيات')
+  await page.getByTestId('team-expand-u_emp_1').click()
+  const pricing = page.getByTestId('perm-pricing-u_emp_1')
+  const payout = page.getByTestId('perm-payout-u_emp_1')
+  await expect(pricing).toHaveClass(/on/)
+  await expect(payout).not.toHaveClass(/on/)
+
+  // Granting flips the switch in place.
+  await payout.click()
+  await expect(payout).toHaveClass(/on/)
+
+  // Inviting adds a pending seat to the list.
+  await page.getByTestId('team-invite-email').fill('karim@alamine-parts.dz')
+  await page.getByTestId('team-invite-send').click()
+  await expect(page.getByTestId('team-list')).toContainText('karim@alamine-parts.dz')
+  await expect(page.getByTestId('team-list')).toContainText('بانتظار القبول')
 })

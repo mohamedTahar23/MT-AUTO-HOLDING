@@ -15,7 +15,9 @@
 //   RPC mutations:        submitOffer (submit_offer), withdrawOffer (withdraw_offer),
 //                         uploadProof (upload_proof), markHandover (mark_handover),
 //                         reconfirmOffer (reconfirm_offer),
-//                         confirmPayoutReceipt (confirm_payout_receipt)
+//                         confirmPayoutReceipt (confirm_payout_receipt),
+//                         updateShop (update_shop), inviteTeamMember (invite_member),
+//                         updateUserPerms (update_perms) — owner-only account area
 //
 // Real adapter sketch (supabase.js):
 //   verifyOtp(email, code) -> supabase.auth.verifyOtp({ email, token: code, type: 'email' })

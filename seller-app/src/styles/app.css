@@ -2691,3 +2691,240 @@
 .act-dot.other {
   background: var(--faint);
 }
+
+/* ============================================================================
+   Account-area popup (إعدادات الحساب / الفريق والصلاحيات / سجل النشاط) —
+   the ui/Modal "blur" variant: fixed blurred backdrop + centered flex-column
+   panel whose header/footer stay pinned while the body scrolls. Tokens only.
+   ========================================================================== */
+.blur-scrim {
+  position: fixed;
+  inset: 0;
+  z-index: 60;
+  background: rgba(14, 32, 66, 0.34);
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 24px; /* the panel never touches the viewport edges */
+  animation: fin 0.16s ease;
+}
+.blur-modal {
+  width: min(920px, 100%);
+  max-height: 88vh;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  background: var(--card);
+  border: 1px solid var(--line);
+  border-radius: 18px;
+  box-shadow: 0 30px 80px rgba(14, 32, 66, 0.28);
+  animation: blurpop 0.18s ease;
+  outline: none;
+}
+@keyframes blurpop {
+  from {
+    opacity: 0;
+    transform: translateY(8px);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+.blur-head {
+  flex: none;
+  display: flex;
+  align-items: flex-start;
+  gap: 14px;
+  padding: 18px 22px;
+  border-bottom: 1px solid var(--line);
+}
+.blur-head h2 {
+  margin: 0;
+  font-size: 18px;
+  font-weight: 800;
+  color: var(--navy-850);
+}
+.blur-head .sub {
+  margin-top: 4px;
+}
+.blur-close {
+  flex: none;
+  margin-inline-start: auto;
+  width: 34px;
+  height: 34px;
+  border-radius: 50%;
+  border: 1px solid var(--line);
+  background: var(--card);
+  color: var(--navy-850);
+  font-size: 14px;
+  cursor: pointer;
+  display: grid;
+  place-items: center;
+  transition: background 0.15s;
+}
+.blur-close:hover {
+  background: var(--line-2);
+}
+.blur-body {
+  overflow: auto;
+  padding: 22px;
+}
+.blur-foot {
+  flex: none;
+  display: flex;
+  gap: 10px;
+  padding: 14px 22px;
+  border-top: 1px solid var(--line);
+  background: var(--card);
+}
+
+/* ---- shared section layout inside the popup ---- */
+.acct-stack {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+.acct-sec-title {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin: 0 0 12px;
+  font-size: 15px;
+  font-weight: 800;
+  color: var(--navy-850);
+}
+/* Settings cards keep their own auto-fit grids so they reflow in the panel. */
+.set-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+  gap: 0 14px;
+}
+.set-grid .field {
+  min-width: 0;
+}
+
+/* ---- الفريق: invite row + seats + permission switches ---- */
+.invite-row {
+  display: flex;
+  gap: 10px;
+  flex-wrap: wrap;
+}
+.invite-row .input {
+  flex: 1 1 240px;
+}
+.team-seat {
+  border: 1px solid var(--line);
+  border-radius: 14px;
+  background: var(--card);
+  overflow: hidden;
+}
+.seat-head {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  width: 100%;
+  padding: 12px 14px;
+  border: 0;
+  background: transparent;
+  font-family: inherit;
+  text-align: start;
+  cursor: pointer;
+  transition: background 0.12s;
+}
+.seat-head:disabled {
+  cursor: default;
+}
+.seat-head:not(:disabled):hover {
+  background: var(--bg);
+}
+.seat-id {
+  flex: 1;
+  min-width: 0;
+}
+.seat-id b {
+  display: block;
+  font-size: 13.5px;
+  color: var(--navy-850);
+}
+.seat-id small {
+  display: block;
+  font-size: 11.5px;
+  color: var(--faint);
+  margin-top: 2px;
+}
+.seat-chev {
+  color: var(--faint);
+  transition: transform 0.15s;
+}
+.seat-chev.open {
+  transform: rotate(180deg);
+}
+.seat-perms {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+  gap: 10px;
+  padding: 12px 14px 14px;
+  border-top: 1px dashed var(--line);
+}
+.perm-switch {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 11px 13px;
+  border: 1px solid var(--line);
+  border-radius: 11px;
+  background: var(--card);
+  font-family: inherit;
+  text-align: start;
+  cursor: pointer;
+  transition: border-color 0.15s, background 0.15s;
+}
+.perm-switch:hover {
+  border-color: var(--navy-line);
+}
+.perm-switch.on {
+  border-color: var(--amber-line);
+  background: var(--amber-soft);
+}
+.perm-switch b {
+  display: block;
+  font-size: 13.5px;
+  color: var(--navy-850);
+}
+.perm-switch small {
+  display: block;
+  font-size: 11.5px;
+  color: var(--muted);
+  margin-top: 2px;
+  line-height: 1.6;
+}
+.perm-track {
+  position: relative;
+  flex: none;
+  width: 44px;
+  height: 26px;
+  border-radius: var(--pill);
+  background: var(--navy-line);
+  transition: background 0.18s;
+}
+.perm-switch.on .perm-track {
+  background: var(--amber);
+}
+.perm-knob {
+  position: absolute;
+  top: 3px;
+  inset-inline-start: 3px;
+  width: 20px;
+  height: 20px;
+  border-radius: 50%;
+  background: var(--card);
+  box-shadow: 0 1px 3px rgba(14, 32, 66, 0.3);
+  transition: inset-inline-start 0.18s;
+}
+.perm-switch.on .perm-knob {
+  inset-inline-start: 21px;
+}

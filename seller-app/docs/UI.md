@@ -11,7 +11,8 @@ rather than repeats them.
 top-level gate in [`App.jsx`](../src/App.jsx) is: no session → `AuthFlow`; shop
 status `review` → `UnderReview`; otherwise → `AppShell`. The store exposes
 `api`, `session`, `shop`, `route`, `mode` (sell ⇄ buy, persisted to
-localStorage), `toast(s)`, `isOwner`, and `perms`.
+localStorage), `accountModal` + `openAccountModal` / `closeAccountModal` (the
+owner account-area popups — see below), `toast(s)`, `isOwner`, and `perms`.
 
 **All data access goes through `api` from
 [`src/api/index.js`](../src/api/index.js)** (currently the mock in
@@ -77,12 +78,13 @@ Any 6-digit OTP verifies; any other email routes to the join-request form.
 - **Rules:**
   - Sidebar items are permission-gated for staff (`pricing` gates queue /
     quotes / deliveries, `payout` gates payouts); the owner sees all.
-  - `activity` is owner-only (`OWNER_ONLY` set) — staff navigating there land
-    back on the queue, and the header menu never offers it to staff.
+  - The account area (settings / team / activity) is **not routed** — it opens
+    as a blurred-backdrop popup (see «Account area» below). `openAccountModal`
+    ignores staff calls, and the header renders the popup for the owner only.
   - Staff see a persistent navy strip explaining the permission model; the R2
     banner renders above every sell screen while `shop.r2.active`.
-  - Header account menu: owner → settings / team / activity + sign-out; staff →
-    a read-only permissions summary + sign-out. The bell navigates to `feed`.
+  - Header account menu: owner → the three account-area popups + sign-out;
+    staff → a read-only permissions summary + sign-out.
   - The البيع ⇄ الشراء header toggle switches the whole app; buy mode renders
     `BuyLanding` full-width with **no sidebar**, and the choice persists across
     reloads (`mtseller.mode` in localStorage).
@@ -214,26 +216,7 @@ Any 6-digit OTP verifies; any other email routes to the join-request form.
 - **Reads:** `api.getMessages()`. **Mutations:** `api.sendMessage(text)`.
 - **Rules:** the thread is with the MT team only — never with the buyer (blind
   wall); disputes go through the shop's official line.
-- **Gaps:** no unread state, no pagination; the header bell badge is a
-  hard-coded "2".
-
-## إعلانات MT — Feed (`route: feed`)
-
-- **Component:** [`screens/Feed.jsx`](../src/components/screens/Feed.jsx).
-- **Reads:** `api.getAnnouncements()` — read-only cards. Reached via the header
-  bell (no sidebar entry).
-
-## سجل نشاط الموظفين — Activity log (`route: activity`, owner-only)
-
-- **Component:** [`screens/Activity.jsx`](../src/components/screens/Activity.jsx).
-- **Reads:** `api.getActivityLog()` — the mock throws for non-owners, mirroring
-  the shell's route guard and the owner-only header menu entry.
-- **Rules:** rows are **staff actions only** (owner actions never listed), each
-  attributed (`who` / `act` / `target` / `meta` / `time`) with a status dot per
-  action kind (quote / message / delivery / withdraw / other).
-- **Gaps:** reads a static seed (`seed.activityLog`), not the live `db.events`
-  audit trail the mock's `logEvent` appends to — new mutations do not appear in
-  the list.
+- **Gaps:** no unread state, no pagination.
 
 ## الشراء — Buy mode (header toggle, not a sidebar route)
 
@@ -245,21 +228,62 @@ Any 6-digit OTP verifies; any other email routes to the join-request form.
   content until Path B (المشتريات) ships; the seven purchasing screens are
   specced in the handoff but unbuilt.
 
-## Coming-soon screens (`route: team`, `route: settings`)
+## Account area (`accountModal`: `settings` / `team` / `activity`, owner-only)
 
-- **Component:** [`screens/ComingSoon.jsx`](../src/components/screens/ComingSoon.jsx)
-  — «قيد الإنشاء» placeholder with a back-to-queue button. Reached from the
-  owner's header menu. Team & permissions and account settings are fully
-  specced in the handoff; `api.getShopUsers()` already exists but has no UI.
+The owner account area does not route: each header-menu item opens its section
+as a centered popup over a blurred backdrop — the `variant="blur"` shell in
+[`ui/Modal.jsx`](../src/components/ui/Modal.jsx) (body-scroll lock, focus trap,
+✕ / Esc / backdrop-click close, focus returned to the menu trigger; portaled to
+`<body>` at z-index 60). `openAccountModal` pairs with `pushState`, so browser
+Back closes the popup (and Forward reopens it); a refresh resets to closed.
+Host: [`account/AccountModal.jsx`](../src/components/account/AccountModal.jsx);
+only the Settings section has footer actions.
+
+### إعدادات الحساب — Settings
+
+- **Component:** [`account/SettingsSection.jsx`](../src/components/account/SettingsSection.jsx)
+  — three cards: store info, Google-Maps location, account & login (read-only
+  owner email + status pills).
+- **Reads:** `shop`, `session.email`, `api.getMeta().wilayas`.
+- **Mutations:** `api.updateShop(patch)` (owner-only; validates the whole patch
+  before writing). Save/reset live in the modal **footer**, stay disabled until
+  a field is dirty, and the fields freeze while the save RPC is in flight.
+
+### الفريق والصلاحيات — Team
+
+- **Component:** [`account/TeamSection.jsx`](../src/components/account/TeamSection.jsx)
+  — invite card + seat list with expandable per-seat permission switches.
+- **Reads:** `api.getShopUsers()`.
+- **Mutations:** `api.inviteTeamMember(email)` — adds an `invited` seat with
+  pricing only; the invitee's first OTP login flips the seat to active — and
+  `api.updateUserPerms(userId, perms)` (optimistic switch flip, reverted from
+  the server list on error).
+- **Rules:** the owner seat is fixed («المالك — كل الصلاحيات»); employee seats
+  expand to the four switches (pricing / media / payout / team).
+
+### سجل نشاط الموظفين — Activity log
+
+- **Component:** [`account/ActivitySection.jsx`](../src/components/account/ActivitySection.jsx).
+- **Reads:** `api.getActivityLog()` — the mock throws for non-owners, mirroring
+  the owner-only menu entry and the `openAccountModal` guard.
+- **Rules:** rows are **staff actions only** (owner actions never listed), each
+  attributed (`who` / `act` / `target` / `meta` / `time`) with a status dot per
+  action kind (quote / message / delivery / withdraw / other).
+- **Gaps:** reads a static seed (`seed.activityLog`), not the live `db.events`
+  audit trail the mock's `logEvent` appends to — new mutations do not appear in
+  the list.
 
 ---
 
 ## E2E coverage
 
-[`e2e/smoke.spec.js`](../e2e/smoke.spec.js) (27 tests) drives: the landing
+[`e2e/smoke.spec.js`](../e2e/smoke.spec.js) (33 tests) drives: the landing
 sections top-to-bottom, both auth paths (known → OTP → queue, unknown → apply),
 Google sign-in, offer submit validation ladder, brand filter, sponsored rail,
 My Offers derivation/commission-tier/withdraw-strike matrix (including the
 3rd-strike R2 lock), Deliveries pills/progress/dispute (owner vs staff),
 Payouts totals/receipt confirmation, buy-mode toggle + persistence + demo
-search, and the activity log (owner reach + staff denial).
+search, the activity log (owner reach + staff denial), and the account-area
+popups (Esc / backdrop / ✕ / browser-Back close semantics, double-Esc safety,
+scroll lock + focus return, settings footer dirty-gating, team invites and
+permission switches).

@@ -1,12 +1,21 @@
-import { useState } from 'react'
+import { useRef, useState } from 'react'
 import { useApp } from '../../state/store.jsx'
+import AccountModal from '../account/AccountModal.jsx'
 
 export default function Header() {
-  const { shop, session, isOwner, signOut, navigate, mode, setMode } = useApp()
+  const { shop, session, isOwner, signOut, mode, setMode, accountModal, openAccountModal, closeAccountModal } = useApp()
   const [open, setOpen] = useState(false)
+  const acctBtnRef = useRef(null) // popup close returns focus here
   const name = shop?.name || 'المحل'
   const initial = name.trim().charAt(0)
   const permCount = Object.values(session?.user?.perms || {}).filter(Boolean).length
+
+  // Account-area sections open as a centered popup over the current view —
+  // picking one no longer navigates anywhere.
+  const openSection = (section) => {
+    openAccountModal(section)
+    setOpen(false)
+  }
 
   return (
     <header className="shell-head">
@@ -55,7 +64,7 @@ export default function Header() {
       </div>
 
       <div className="acct">
-        <button className="acct-btn" onClick={() => setOpen((o) => !o)}>
+        <button className="acct-btn" ref={acctBtnRef} onClick={() => setOpen((o) => !o)}>
           <span className={`avatar ${isOwner ? '' : 'staff'}`}>{initial}</span>
           <span style={{ textAlign: 'start', lineHeight: 1.25 }}>
             <span style={{ display: 'block', fontWeight: 800, fontSize: 13.5, color: 'var(--navy-850)' }}>
@@ -74,13 +83,13 @@ export default function Header() {
           <div className="acct-menu" onMouseLeave={() => setOpen(false)}>
             {isOwner ? (
               <>
-                <button onClick={() => (setMode('sell'), navigate('settings'), setOpen(false))}>
+                <button data-testid="menu-settings" onClick={() => openSection('settings')}>
                   إعدادات الحساب<small>بيانات المحل والوثائق</small>
                 </button>
-                <button onClick={() => (setMode('sell'), navigate('team'), setOpen(false))}>
+                <button data-testid="menu-team" onClick={() => openSection('team')}>
                   الفريق والصلاحيات<small>دعوة الموظفين والتحكم في صلاحياتهم</small>
                 </button>
-                <button onClick={() => (setMode('sell'), navigate('activity'), setOpen(false))}>
+                <button data-testid="menu-activity" onClick={() => openSection('activity')}>
                   سجل نشاط الموظفين<small>من فعل ماذا ومتى</small>
                 </button>
               </>
@@ -97,6 +106,10 @@ export default function Header() {
           </div>
         )}
       </div>
+
+      {isOwner && accountModal && (
+        <AccountModal section={accountModal} onClose={closeAccountModal} restoreFocus={acctBtnRef} />
+      )}
     </header>
   )
 }

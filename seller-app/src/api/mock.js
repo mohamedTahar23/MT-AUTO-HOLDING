@@ -76,10 +76,16 @@ export const mockApi = {
   async verifyOtp(email, code) {
     await delay()
     if (!/^\d{6}$/.test(String(code))) throw new Error('الرمز يجب أن يكون 6 أرقام')
-    const userId = seed.knownAccounts[email.trim().toLowerCase()]
-    if (!userId) throw new Error('unknown-email') // caller routes to the apply form
-    const user = db.users.find((u) => u.id === userId)
-    writeSession({ shopId: db.shop.id, user })
+    const e = email.trim().toLowerCase()
+    // Resolve seeded accounts, then invited seats (invite_member adds the
+    // email to db.users — their first login flips the seat to active).
+    const userId = seed.knownAccounts[e]
+    const user = userId
+      ? db.users.find((u) => u.id === userId)
+      : db.users.find((u) => (u.email || '').toLowerCase() === e)
+    if (!user) throw new Error('unknown-email') // caller routes to the apply form
+    if (user.status === 'invited') user.status = 'active'
+    writeSession({ shopId: db.shop.id, user, email: e })
     logEvent('login', email)
     return { session: clone(session), shop: clone(db.shop) }
   },
@@ -90,7 +96,7 @@ export const mockApi = {
     // adapter: supabase.auth.signInWithOAuth({ provider: 'google' }) + session
     // pickup on redirect.
     const user = db.users.find((u) => u.id === seed.knownAccounts['owner@alamine-parts.dz'])
-    writeSession({ shopId: db.shop.id, user })
+    writeSession({ shopId: db.shop.id, user, email: 'owner@alamine-parts.dz' })
     logEvent('login', 'google:owner@alamine-parts.dz')
     return { session: clone(session), shop: clone(db.shop) }
   },
@@ -204,6 +210,61 @@ export const mockApi = {
   },
 
   // ---- RPC mutations ------------------------------------------------------
+  // update_shop — owner edits the shop profile (إعدادات الحساب). Only the
+  // profile fields are writable; status/r2/rating stay server-owned.
+  async updateShop(patch) {
+    await delay(420)
+    const s = requireSession()
+    if (s.user.role !== 'owner') throw new Error('إعدادات الحساب متاحة للمالك فقط')
+    // Validate the whole patch BEFORE touching db.shop — a rejected save must
+    // not leave a partial write behind.
+    const next = {}
+    for (const k of ['name', 'wilaya', 'phone', 'address', 'mapsUrl']) {
+      if (typeof patch?.[k] === 'string') next[k] = patch[k].trim()
+    }
+    if ('name' in next && !next.name) throw new Error('اسم المحل مطلوب')
+    Object.assign(db.shop, next)
+    logEvent('update_shop', db.shop.name)
+    return clone(db.shop)
+  },
+
+  // invite_member — owner invites an employee seat (الفريق والصلاحيات). The
+  // seat starts 'invited' with pricing only; the owner grants the rest.
+  async inviteTeamMember(email) {
+    await delay(420)
+    const s = requireSession()
+    if (s.user.role !== 'owner') throw new Error('إدارة الفريق متاحة للمالك فقط')
+    const e = String(email || '').trim().toLowerCase()
+    if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(e)) throw new Error('الرجاء إدخال بريد إلكتروني صحيح')
+    if (db.users.some((u) => (u.email || '').toLowerCase() === e)) throw new Error('هذا البريد موجود في الفريق من قبل')
+    const user = {
+      id: uid('u'),
+      shop_id: db.shop.id,
+      name: e.split('@')[0],
+      email: e,
+      role: 'employee',
+      status: 'invited',
+      perms: { pricing: true, media: false, payout: false, team: false },
+    }
+    db.users.push(user)
+    logEvent('invite_member', e)
+    return clone(user)
+  },
+
+  // update_perms — owner flips a seat's permission switches. The owner's own
+  // perms are fixed (always everything).
+  async updateUserPerms(userId, perms) {
+    await delay(260)
+    const s = requireSession()
+    if (s.user.role !== 'owner') throw new Error('إدارة الصلاحيات متاحة للمالك فقط')
+    const u = db.users.find((x) => x.id === userId)
+    if (!u) throw new Error('الموظف غير موجود')
+    if (u.role === 'owner') throw new Error('صلاحيات المالك ثابتة')
+    u.perms = { pricing: false, media: false, payout: false, team: false, ...perms }
+    logEvent('update_perms', `${u.email || u.name} · ${Object.keys(u.perms).filter((k) => u.perms[k]).join(',') || '—'}`)
+    return clone(u)
+  },
+
   // submit_offer — validates and appends a competing offer row.
   async submitOffer({ taskId, price, brand, country, buyer_note = '', commit_agree, partNo = '' }) {
     await delay(420)
