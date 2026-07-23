@@ -189,10 +189,6 @@ export const mockApi = {
     if (s.user.role !== 'owner') throw new Error('سجل النشاط متاح للمالك فقط')
     return clone(seed.activityLog)
   },
-  async getAnnouncements() {
-    await delay(120)
-    return clone(seed.announcements)
-  },
   async getAds() {
     await delay(120)
     return clone(seed.ads)

@@ -7,7 +7,7 @@
 //
 //   Reads (RLS-guarded):  getShop, getShopUsers, getTasks (seller_task_v),
 //                         getOffers, getOrders, getPayouts, getPerformance,
-//                         getMessages, getAnnouncements, getMeta,
+//                         getMessages, getMeta,
 //                         getWholesaleDemo (static Buy-landing demo catalog),
 //                         getActivityLog (owner-only staff audit trail)
 //   Auth:                 requestOtp, verifyOtp, signInWithGoogle,

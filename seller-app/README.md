@@ -67,7 +67,7 @@ seller-app/
       ├─ landing/             # the full marketing landing, one component per design section
       ├─ shell/               # AppShell · Header (sell ⇄ buy mode toggle) · Sidebar · R2Banner
       ├─ buy/                 # BuyLanding — الشراء coming-soon page + demo wholesale search
-      ├─ screens/             # Queue · MyOffers · Deliveries · Payouts · Performance · Messages · Feed
+      ├─ screens/             # Queue · MyOffers · Deliveries · Payouts · Performance · Messages
       ├─ modals/              # OfferModal · WithdrawModal · VideoModal
       └─ ui/                  # bits (Ltr/Pill/RefChip/Tile) · Modal · Stepper · Toaster
 ```
