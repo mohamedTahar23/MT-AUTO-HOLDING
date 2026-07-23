@@ -55,19 +55,6 @@ export default function Header() {
       </div>
 
       <div className="acct">
-        <button
-          className="bell"
-          title="الإشعارات"
-          onClick={() => {
-            setMode('sell')
-            navigate('feed')
-          }}
-        >
-          🔔<span className="badge">2</span>
-        </button>
-      </div>
-
-      <div className="acct">
         <button className="acct-btn" onClick={() => setOpen((o) => !o)}>
           <span className={`avatar ${isOwner ? '' : 'staff'}`}>{initial}</span>
           <span style={{ textAlign: 'start', lineHeight: 1.25 }}>
