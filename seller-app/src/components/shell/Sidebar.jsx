@@ -2,11 +2,12 @@ import { useApp } from '../../state/store.jsx'
 
 // Nav model (sell dashboard — buy mode is a single landing with no sidebar).
 // `perm` gates items for staff (owner sees all). `soon` = coming-soon.
-const SELL = [
-  { name: 'queue', label: 'طابور التسعير', perm: 'pricing', badge: 'queue', tone: 'amber' },
-  { name: 'quotes', label: 'عروضي', perm: 'pricing', badge: 'quotes', tone: 'grey' },
-  { name: 'deliveries', label: 'التسليمات', perm: 'pricing', badge: 'deliveries', tone: 'amber' },
-  { name: 'payouts', label: 'الأرباح', perm: 'payout' },
+// Shared with the ≤900px bottom tab bar (MobileNav) — `short` is its label.
+export const SELL = [
+  { name: 'queue', label: 'طابور التسعير', short: 'التسعير', perm: 'pricing', badge: 'queue', tone: 'amber' },
+  { name: 'quotes', label: 'عروضي', short: 'عروضي', perm: 'pricing', badge: 'quotes', tone: 'grey' },
+  { name: 'deliveries', label: 'التسليمات', short: 'التسليمات', perm: 'pricing', badge: 'deliveries', tone: 'amber' },
+  { name: 'payouts', label: 'الأرباح', short: 'الأرباح', perm: 'payout' },
 ]
 
 export default function Sidebar({ counts }) {

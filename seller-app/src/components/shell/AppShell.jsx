@@ -2,6 +2,7 @@ import { useEffect, useState, useCallback } from 'react'
 import { useApp } from '../../state/store.jsx'
 import Header from './Header.jsx'
 import Sidebar from './Sidebar.jsx'
+import MobileNav from './MobileNav.jsx'
 import R2Banner from './R2Banner.jsx'
 import Queue from '../screens/Queue.jsx'
 import MyOffers from '../screens/MyOffers.jsx'
@@ -77,6 +78,8 @@ export default function AppShell() {
           </div>
         </main>
       </div>
+      {/* ≤900px replacement for the hidden sidebar — same model, same gating. */}
+      <MobileNav counts={counts} />
     </div>
   )
 }

@@ -70,6 +70,7 @@ Any 6-digit OTP verifies; any other email routes to the join-request form.
 - **Components:** [`shell/AppShell.jsx`](../src/components/shell/AppShell.jsx),
   [`shell/Header.jsx`](../src/components/shell/Header.jsx),
   [`shell/Sidebar.jsx`](../src/components/shell/Sidebar.jsx),
+  [`shell/MobileNav.jsx`](../src/components/shell/MobileNav.jsx),
   [`shell/R2Banner.jsx`](../src/components/shell/R2Banner.jsx).
 - **Reads:** `route`, `shop` (R2 state), `isOwner`, `perms`, `mode`; badge
   counts from `getTasks` / `getOffers` (status `sent`) / `getOrders` (stage ≠
@@ -77,7 +78,14 @@ Any 6-digit OTP verifies; any other email routes to the join-request form.
   each screen receives.
 - **Rules:**
   - Sidebar items are permission-gated for staff (`pricing` gates queue /
-    quotes / deliveries, `payout` gates payouts); the owner sees all.
+    quotes / deliveries, `payout` gates payouts); the owner sees all. The nav
+    model (`SELL` in `Sidebar.jsx`) is shared with the phone shell: at ≤900px
+    the sidebar hides and `MobileNav` renders the same gated items as a fixed
+    bottom tab bar (`.mnav`, testids `mnav-*`).
+  - **The shell must never overflow horizontally** — in RTL an overflowing
+    page shifts leftward and mis-anchors every `position: fixed` overlay
+    (account popup, toasts). ≤560px the header compacts to logo-only brand +
+    avatar-only account chip; the phone e2e project asserts the invariant.
   - The account area (settings / team / activity) is **not routed** — it opens
     as a blurred-backdrop popup (see «Account area» below). `openAccountModal`
     ignores staff calls, and the header renders the popup for the owner only.
@@ -276,6 +284,12 @@ only the Settings section has footer actions.
 ---
 
 ## E2E coverage
+
+Two Playwright projects (see `playwright.config.js`): desktop Chrome runs
+`smoke.spec.js`, and a Pixel-7 phone project runs
+[`e2e/mobile.spec.js`](../e2e/mobile.spec.js) (3 tests) — no horizontal
+overflow on the landing and dashboard, hero-card badge integrity, bottom
+tab-bar navigation, and account-popup anchoring/closing on a phone.
 
 [`e2e/smoke.spec.js`](../e2e/smoke.spec.js) (33 tests) drives: the landing
 sections top-to-bottom, both auth paths (known → OTP → queue, unknown → apply),
