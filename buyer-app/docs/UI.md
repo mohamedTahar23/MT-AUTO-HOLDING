@@ -37,9 +37,10 @@ fees), `WHATSAPP`, and the seeded demo account (`SAVED_PROFILE`,
   when logged in), `openHub`, `openAcct`, `openContact`, `openTerms`,
   `toggleMenu` / `closeMenu`, `goLogin`.
 - **Rules:** none of its own; the «اطلب قطعتك» CTA routes by `loggedIn`.
-- **Gaps:** the hero background photo is missing from the design export — navy
-  gradient fallback renders (see BUYER-APP.md "Known quirks"). The map iframe
-  and Cairo font are external and blank/fall back offline.
+- **Gaps:** the map iframe and Cairo font are external and blank/fall back
+  offline. The hero background photo (the shopfront `IMG_20251011_101535.jpg`)
+  is restored in `extra.css`, layered under the navy scrim from site.css; the
+  navy gradient still renders as the fallback if the image fails to load.
 
 ## Login (`#account`, logged out)
 

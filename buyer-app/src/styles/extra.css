@@ -3,6 +3,21 @@
    Copied verbatim from "**** MT AUTO - BUYER ***.dc.html". */
 html, body { margin: 0; background: var(--bg); }
 
+/* ============ Hero storefront photo ============
+   Restores the design's IMG_20251011_101535.jpg layer that was dropped from the
+   export (see the note on `.req-hero` in site.css). site.css stays verbatim and
+   keeps only the navy scrim + solid fallback, so the url() layer is slotted in
+   here: photo between the scrim and the fallback. The dark scrim from site.css is
+   repeated on top so the white hero copy keeps its contrast, and --navy-850 stays
+   as the last-resort fill if the image ever fails to load. The file lives in
+   public/, so it is served from the app root. */
+.req-hero{
+  background:
+    linear-gradient(180deg, rgba(8,13,26,.82), rgba(8,13,26,.72) 48%, rgba(8,13,26,.88)),
+    url("/IMG_20251011_101535.jpg") center / cover no-repeat,
+    var(--navy-850);
+}
+
 .mysr-fab{position:fixed;inset-inline-start:24px;bottom:24px;z-index:95;width:60px;height:60px;border-radius:50%;border:none;cursor:pointer;background:var(--navy-800);color:#fff;box-shadow:0 10px 26px rgba(10,24,48,.34);display:grid;place-items:center;transition:background .15s,transform .15s;}
 .mysr-fab:hover{background:var(--navy-700);transform:translateY(-1px);}
 .mysr-panel{position:fixed;inset-inline-start:24px;bottom:24px;z-index:96;width:372px;max-width:calc(100vw - 32px);height:582px;max-height:calc(100vh - 40px);background:var(--card);border:1px solid var(--line);border-radius:20px;box-shadow:0 26px 72px rgba(8,16,30,.42);display:flex;flex-direction:column;overflow:hidden;}

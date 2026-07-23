@@ -286,11 +286,12 @@ environments a system Chromium can be supplied via `CHROMIUM_PATH` instead
 
 ## Known quirks
 
-- **Missing hero photo.** The design's hero references `IMG_20251011_101535.jpg`,
-  which was not included in the design export. The `url()` layer was removed from
-  `.req-hero` in `src/styles/site.css` (a comment marks the spot); the navy gradient
-  fallback renders instead. Restore the image + the `url()` layer for the intended
-  look.
+- **Hero photo lives in `extra.css`, not `site.css`.** The design's hero photo
+  (`IMG_20251011_101535.jpg`, the shopfront in الحجار) ships in `buyer-app/public/`
+  and is layered into `.req-hero` from `src/styles/extra.css`. site.css stays
+  verbatim, so its `.req-hero` keeps only the navy scrim + solid fallback and a
+  comment marking the spot; the `url()` layer belongs in extra.css. If the image
+  is ever missing, the navy gradient renders in its place.
 - **Demo OTP on screen.** By design for the prototype phase — the generated code is
   shown in the UI. Remove the banner when real OTP lands (see the mock table).
 - **`loginVerify` accepts any ≥4-digit input.** Inherited from the prototype; the
