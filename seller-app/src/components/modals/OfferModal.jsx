@@ -3,7 +3,7 @@ import Modal from '../ui/Modal.jsx'
 import { RefChip, Ltr, Spinner } from '../ui/bits.jsx'
 import { useApp } from '../../state/store.jsx'
 import { api } from '../../api/index.js'
-import { netEarnings, rateLabel, money } from '../../lib/format.js'
+import { netEarnings, rateLabel, commissionAmount, money } from '../../lib/format.js'
 
 const { countries } = api.getMeta()
 const EMPTY = { price: '', brand: '', country: '', countryOther: '', note: '', partNo: '', agree: false }
@@ -67,7 +67,8 @@ export default function OfferModal({ task, onClose, onSubmitted }) {
     setSent(false)
   }
 
-  const net = f.price ? netEarnings(f.price) : 0
+  // Live earnings breakdown — shown as soon as a price is typed.
+  const priceNum = Number(f.price || 0)
 
   // ---- Confirmation ("what happens next") ---------------------------------
   if (sent) {
@@ -196,10 +197,24 @@ export default function OfferModal({ task, onClose, onSubmitted }) {
           <span className="cur">دج</span>
         </div>
         <div className="hint">هذا ما يراه المشتري ويقارنه بالعروض الأخرى.</div>
-        {f.price.length >= 3 && (
-          <div className="hint">
-            عمولة MT AUTO {rateLabel(f.price)} · صافي أرباحك <Ltr mono>{money(net)}</Ltr>
-          </div>
+        {priceNum > 0 && (
+          <>
+            <div className="receipt receipt-light" style={{ marginTop: 10 }} data-testid="offer-earnings">
+              <div className="r">
+                <span>سعرك للمشتري</span>
+                <Ltr mono>{money(priceNum)}</Ltr>
+              </div>
+              <div className="r" data-testid="offer-commission">
+                <span>عمولة MT AUTO ({rateLabel(f.price)})</span>
+                <Ltr mono>−{money(commissionAmount(f.price))}</Ltr>
+              </div>
+              <div className="r total" data-testid="offer-net">
+                <span>صافي أرباحك</span>
+                <Ltr mono>{money(netEarnings(f.price))}</Ltr>
+              </div>
+            </div>
+            <div className="hint">العمولة 10% حتى 50 000 دج، و6% لما فوقها.</div>
+          </>
         )}
       </div>
 

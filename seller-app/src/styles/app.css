@@ -801,6 +801,19 @@
   font-weight: 900;
   font-size: 15px;
 }
+/* Light-surface variant — the same receipt rows on a white card (offer modal),
+   where the white-alpha fill of the navy version would be invisible. */
+.receipt.receipt-light {
+  background: var(--navy-tint);
+  border: 1px solid var(--line);
+}
+.receipt.receipt-light .r {
+  color: var(--muted);
+}
+.receipt.receipt-light .r.total {
+  border-top-color: var(--line);
+  color: var(--navy-850);
+}
 
 /* spinner */
 .spin {
