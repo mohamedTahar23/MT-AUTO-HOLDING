@@ -3,9 +3,10 @@ import { useState } from 'react'
 /**
  * "تصفية حسب الماركة" — multi-select car-brand filter grouped by origin
  * (فرنسية / كورية / ألمانية / يابانية). Controlled: the parent owns the
- * `selected` Set of car makes and narrows the request grid.
+ * `selected` Set of car makes and narrows the request grid. Tapping a country
+ * heading bulk-toggles every brand in that group (`onToggleCountry`).
  */
-export default function BrandFilter({ groups, selected, onToggle, onClear }) {
+export default function BrandFilter({ groups, selected, onToggle, onToggleCountry, onClear }) {
   const [open, setOpen] = useState(false)
   const count = selected.size
 
@@ -43,24 +44,36 @@ export default function BrandFilter({ groups, selected, onToggle, onClear }) {
               </button>
             </div>
 
-            {groups.map((g) => (
-              <div className="bf-group" key={g.country}>
-                <div className="bf-group-title">{g.country}</div>
-                <div className="bf-chips">
-                  {g.brands.map((b) => (
-                    <button
-                      type="button"
-                      key={b}
-                      className={`chip ${selected.has(b) ? 'on' : ''}`}
-                      onClick={() => onToggle(b)}
-                      data-testid={`brand-opt-${b}`}
-                    >
-                      {b}
-                    </button>
-                  ))}
+            {groups.map((g) => {
+              const allOn = g.brands.every((b) => selected.has(b))
+              return (
+                <div className="bf-group" key={g.country}>
+                  <button
+                    type="button"
+                    className={`bf-group-title ${allOn ? 'on' : ''}`}
+                    onClick={() => onToggleCountry(g.brands)}
+                    aria-pressed={allOn}
+                    title="اختيار كل ماركات هذا البلد"
+                    data-testid={`brand-country-${g.country}`}
+                  >
+                    {g.country}
+                  </button>
+                  <div className="bf-chips">
+                    {g.brands.map((b) => (
+                      <button
+                        type="button"
+                        key={b}
+                        className={`chip ${selected.has(b) ? 'on' : ''}`}
+                        onClick={() => onToggle(b)}
+                        data-testid={`brand-opt-${b}`}
+                      >
+                        {b}
+                      </button>
+                    ))}
+                  </div>
                 </div>
-              </div>
-            ))}
+              )
+            })}
           </div>
         </>
       )}
