@@ -4,6 +4,20 @@ Working rules for this repo. Read before writing code. Screen-level detail lives
 in each app's `docs/UI.md`; architecture background in `buyer-app/docs/BUYER-APP.md`
 and `seller-app/README.md` — don't duplicate those here or there.
 
+## How to work — read this first
+
+- **No subagents** unless I explicitly ask. Do the work yourself.
+- **One app per session.** Don't open the other app's files unless I ask.
+- **Read narrow.** Name the 2–3 files you need before opening anything.
+  Never scan the tree or grep the repo to "get oriented" — this file plus
+  the app's `docs/UI.md` is the orientation.
+- **Load docs on demand**, not upfront: `docs/UI.md` only when touching a
+  screen; `BUYER-APP.md` / `seller-app/README.md` only when architecture
+  is actually in question.
+- **Short replies.** No recap of what you just did, no file listings, no
+  summaries of code you didn't change.
+
+  
 ## Repo layout
 
 - `buyer-app/` and `seller-app/` are sibling, fully self-contained apps: each has
