@@ -1,9 +1,13 @@
 import { useState } from 'react'
 import { api } from '../../api/index.js'
 import { Ltr, Spinner } from '../ui/bits.jsx'
+import LocationPicker from './LocationPicker.jsx'
 
-const MAPS_RE = /^https?:\/\/(maps\.google\.[a-z.]+|goo\.gl\/maps|maps\.app\.goo\.gl|www\.google\.[a-z.]+\/maps)\//i
 const { brandChips, wilayas } = api.getMeta()
+
+// The store location is picked on a map; persist it as a maps URL so the shop's
+// existing `mapsUrl` field (settings, seed) keeps working unchanged.
+const geoToMapsUrl = (g) => (g ? `https://www.google.com/maps?q=${g.lat},${g.lng}` : '')
 
 // Shop join request (SELLER-2 enrollment payload).
 export default function ApplyForm({ email, onSubmit, onBack }) {
@@ -14,14 +18,10 @@ export default function ApplyForm({ email, onSubmit, onBack }) {
     gPhone2: '',
     gAddress: '',
     gOwner: '',
-    gNif: '',
-    gRc: '',
     gChips: [],
-    gMapsUrl: '',
+    gGeo: null,
   })
   const [touched, setTouched] = useState(false)
-  const [mapsOk, setMapsOk] = useState(false)
-  const [mapsErr, setMapsErr] = useState('')
   const [busy, setBusy] = useState(false)
 
   const set = (k, v) => setF((p) => ({ ...p, [k]: v }))
@@ -31,16 +31,6 @@ export default function ApplyForm({ email, onSubmit, onBack }) {
   const required = ['gShopName', 'gPhone1', 'gAddress', 'gOwner']
   const missing = (k) => touched && required.includes(k) && !f[k].trim()
 
-  function verifyMaps() {
-    if (MAPS_RE.test(f.gMapsUrl.trim())) {
-      setMapsOk(true)
-      setMapsErr('')
-    } else {
-      setMapsOk(false)
-      setMapsErr('الرابط غير صالح — ألصق رابط موقعك على خرائط Google.')
-    }
-  }
-
   function fillDemo() {
     setF({
       gShopName: 'محل الأطلس لقطع الغيار',
@@ -49,24 +39,18 @@ export default function ApplyForm({ email, onSubmit, onBack }) {
       gPhone2: '',
       gAddress: 'حي المنظر الجميل، الشارع الرئيسي، عنابة',
       gOwner: 'محمد الأطلسي',
-      gNif: '',
-      gRc: '',
       gChips: ['Volkswagen', 'Peugeot', 'Renault'],
-      gMapsUrl: 'https://maps.google.com/?q=Atlas+Auto+Annaba',
+      gGeo: { lat: 36.8055, lng: 7.7346 },
     })
-    setMapsOk(true)
   }
 
   async function submit(e) {
     e.preventDefault()
     setTouched(true)
-    if (required.some((k) => !f[k].trim()) || !MAPS_RE.test(f.gMapsUrl.trim())) {
-      if (!MAPS_RE.test(f.gMapsUrl.trim())) setMapsErr('الرابط غير صالح — ألصق رابط موقعك على خرائط Google.')
-      return
-    }
+    if (required.some((k) => !f[k].trim())) return
     setBusy(true)
     try {
-      await onSubmit(f)
+      await onSubmit({ ...f, gMapsUrl: geoToMapsUrl(f.gGeo) })
     } finally {
       setBusy(false)
     }
@@ -163,15 +147,10 @@ export default function ApplyForm({ email, onSubmit, onBack }) {
                 onChange={(e) => set('gOwner', e.target.value)}
               />
             </div>
-            <div className="field grow">
-              <label>NIF / RC (اختياري)</label>
-              <input className="input ltr" value={f.gNif} onChange={(e) => set('gNif', e.target.value)} />
-            </div>
           </div>
 
           <h3 style={sec}>2 · التخصّص والموقع</h3>
           <div className="field">
-            <label>الماركات والسيارات التي تخدمها</label>
             <div className="row wrap" style={{ gap: 8 }}>
               {brandChips.map((c) => (
                 <button
@@ -186,32 +165,11 @@ export default function ApplyForm({ email, onSubmit, onBack }) {
             </div>
           </div>
           <div className="field">
-            <label>
-              رابط خرائط Google <span className="req">*</span>{' '}
-              <span className="pill pill-amber" style={{ fontSize: 10 }}>
-                من الأفضل
-              </span>
-            </label>
-            <div className="hint" style={{ marginBottom: 6 }}>
-              من الأفضل أن يكون محلك مسجّلاً على خرائط Google — ألصق رابط المحل.
+            <label>موقع المحل على الخريطة (اختياري)</label>
+            <div className="hint" style={{ marginBottom: 8 }}>
+              حدِّد موقع محلك على الخريطة ليصل إليه المشترون بسهولة — اضغط «حدّد موقعي» أو انقر على الخريطة واسحب الدبوس.
             </div>
-            <div className="row" style={{ gap: 8 }}>
-              <input
-                className={`input ltr grow ${mapsErr ? 'err' : ''}`}
-                placeholder="https://maps.google.com/..."
-                value={f.gMapsUrl}
-                onChange={(e) => {
-                  set('gMapsUrl', e.target.value)
-                  setMapsOk(false)
-                  setMapsErr('')
-                }}
-              />
-              <button type="button" className="btn btn-ghost" onClick={verifyMaps}>
-                تحقّق
-              </button>
-            </div>
-            {mapsOk && <div className="err-text" style={{ color: 'var(--green-text)' }}>✓ تم التحقق من الرابط</div>}
-            {mapsErr && <div className="err-text">{mapsErr}</div>}
+            <LocationPicker value={f.gGeo} onChange={(geo) => set('gGeo', geo)} />
           </div>
 
           <div className="row between center wrap" style={{ marginTop: 16, gap: 10 }}>

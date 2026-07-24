@@ -59,8 +59,11 @@ Any 6-digit OTP verifies; any other email routes to the join-request form.
 ### Join request (apply) + under review
 
 - **Components:** [`auth/ApplyForm.jsx`](../src/components/auth/ApplyForm.jsx)
-  (SELLER-2 enrollment payload: shop name, wilaya, phones, address, owner, NIF,
-  RC, brand chips, Google-Maps URL validated against a maps-domain regex),
+  (SELLER-2 enrollment payload: shop name, wilaya, phones, address, owner,
+  brand chips, and an **optional** store location picked on an interactive map
+  — [`auth/LocationPicker.jsx`](../src/components/auth/LocationPicker.jsx),
+  Leaflet + OpenStreetMap, geolocation button + draggable pin — persisted as a
+  `maps?q=lat,lng` URL in `mapsUrl` so settings/seed stay unchanged),
   [`auth/UnderReview.jsx`](../src/components/auth/UnderReview.jsx).
 - **Reads:** `api.getMeta()` (brand chips, wilayas).
 - **Mutations:** `api.applyShop(payload)` — creates a `review`-status shop and a
@@ -110,7 +113,8 @@ Any 6-digit OTP verifies; any other email routes to the join-request form.
   identity), `api.getOrders()` (to surface a priority "مطلوب فيديو" strip when a
   won order has `proofStatus === 'بانتظار'`), `api.getOffers()` (tasks with a
   live `sent` offer render as already priced), `api.getMeta().carBrandGroups`
-  (brand filter), `api.getAds()` (sponsored rail carousel); `ageLabel` from
+  (brand filter — tapping a country heading selects/clears every brand in that
+  group), `api.getAds()` (sponsored rail carousel); `ageLabel` from
   `format.js` for card ages.
 - **Mutations:** none directly — opens `OfferModal` (submit) and `VideoModal`
   (proof upload); both refresh via `load()` + `onData`.
