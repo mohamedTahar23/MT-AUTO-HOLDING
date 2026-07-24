@@ -128,8 +128,9 @@ Any 6-digit OTP verifies; any other email routes to the join-request form.
 
 - **Component:** [`modals/OfferModal.jsx`](../src/components/modals/OfferModal.jsx).
 - **Reads:** the task (id, part name + OEM ref chip, car, engine),
-  `api.getMeta().countries`; live commission preview from `format.js`
-  (`rateLabel`, `netEarnings`, `money`) once the price has ≥ 3 digits.
+  `api.getMeta().countries`; live earnings breakdown from `format.js`
+  (`rateLabel`, `commissionAmount`, `netEarnings`, `money`) — a `.receipt`
+  (price → commission → net) rendered as soon as the typed price is > 0.
 - **Mutations:** `api.submitOffer({ taskId, price, brand, country, buyer_note,
   partNo, commit_agree })`. "أرسِل وسعّر ماركة أخرى" submits and resets the form
   for a multi-brand offer; a plain submit shows the "what happens next"
