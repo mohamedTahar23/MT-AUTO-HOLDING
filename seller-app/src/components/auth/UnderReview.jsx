@@ -45,10 +45,6 @@ export default function UnderReview() {
           </div>
         </div>
 
-        <div className="strip strip-navy" style={{ marginTop: 14 }}>
-          سنُعلمك عبر البريد الإلكتروني وواتساب فور تفعيل حسابك.
-        </div>
-
         <p className="sub" style={{ marginTop: 16 }}>
           لديك سؤال؟{' '}
           <a href="mailto:support@mtauto.cloud">تواصل مع الدعم</a>
