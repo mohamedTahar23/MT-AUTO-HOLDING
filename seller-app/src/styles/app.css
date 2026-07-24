@@ -356,17 +356,18 @@
   font-weight: 900;
   color: var(--navy-850);
 }
+/* Real MT AUTO logo mark (was a placeholder navy "MT" badge). The one-color SVG
+   inherits `.brand`'s navy on the white headers; sized by height. */
 .brand .logo {
-  width: 34px;
-  height: 34px;
-  border-radius: 9px;
-  background: var(--navy-850);
-  color: #fff;
-  display: grid;
-  place-items: center;
-  font-weight: 900;
-  font-size: 14px;
-  letter-spacing: 0.02em;
+  height: 30px;
+  color: var(--navy-850);
+  display: inline-flex;
+  align-items: center;
+}
+.brand .logo svg {
+  height: 100%;
+  width: auto;
+  display: block;
 }
 .shell-body {
   display: flex;

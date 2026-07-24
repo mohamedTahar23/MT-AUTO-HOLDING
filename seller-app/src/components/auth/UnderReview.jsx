@@ -1,4 +1,5 @@
 import { useApp } from '../../state/store.jsx'
+import { Logo } from '../ui/bits.jsx'
 
 // "حسابك قيد المراجعة" — post-application pending state.
 export default function UnderReview() {
@@ -7,7 +8,7 @@ export default function UnderReview() {
     <div className="auth-wrap">
       <div className="auth-card" style={{ maxWidth: 500, textAlign: 'center' }}>
         <div className="brand" style={{ justifyContent: 'center', marginBottom: 16 }}>
-          <span className="logo">MT</span> MT AUTO
+          <span className="logo"><Logo /></span> MT AUTO
         </div>
         <div className="pulse-clock" aria-hidden>
           ⏳

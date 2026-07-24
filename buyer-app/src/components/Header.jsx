@@ -1,4 +1,4 @@
-import { IOrders } from '../icons.jsx'
+import { IOrders, Logo } from '../icons.jsx'
 
 export default function Header({ app }) {
   const { s, vm, goOrder, openContact, openHub, openAcct, toggleMenu } = app
@@ -6,7 +6,7 @@ export default function Header({ app }) {
     <header className="site-head">
       <div className="wrap">
         <a className="brand" href="#" onClick={(e) => { e.preventDefault(); goOrder() }}>
-          <span className="mark">MT</span>
+          <span className="mark"><Logo /></span>
           <span className="wm"><b>MT AUTO</b></span>
         </a>
         <nav className="nav-main" aria-label="رئيسية">

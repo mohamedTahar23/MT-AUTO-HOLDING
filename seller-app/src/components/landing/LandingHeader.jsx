@@ -1,4 +1,5 @@
 import { scrollToSignin } from './bits.jsx'
+import { Logo } from '../ui/bits.jsx'
 
 /** §1 — top bar: brand, FR|AR language toggle (AR active), sign-in button. */
 export default function LandingHeader() {
@@ -6,7 +7,7 @@ export default function LandingHeader() {
     <header className="land-head">
       <div className="wrap">
         <div className="brand">
-          <span className="logo">MT</span> MT AUTO
+          <span className="logo"><Logo /></span> MT AUTO
         </div>
         <span style={{ marginInlineStart: 'auto' }} />
         <div className="lang-toggle" role="group" aria-label="اللغة">

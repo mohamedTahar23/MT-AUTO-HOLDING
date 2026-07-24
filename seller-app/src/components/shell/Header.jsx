@@ -1,5 +1,6 @@
 import { useRef, useState } from 'react'
 import { useApp } from '../../state/store.jsx'
+import { Logo } from '../ui/bits.jsx'
 import AccountModal from '../account/AccountModal.jsx'
 
 export default function Header() {
@@ -20,7 +21,7 @@ export default function Header() {
   return (
     <header className="shell-head">
       <div className="brand">
-        <span className="logo">MT</span> MT AUTO
+        <span className="logo"><Logo /></span> MT AUTO
       </div>
 
       {/* Sell ⇄ Buy mode — switches the whole app; choice persists (store). */}
