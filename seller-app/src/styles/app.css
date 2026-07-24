@@ -356,19 +356,7 @@
   font-weight: 900;
   color: var(--navy-850);
 }
-/* Real MT AUTO logo mark (was a placeholder navy "MT" badge). The one-color SVG
-   inherits `.brand`'s navy on the white headers; sized by height. */
-.brand .logo {
-  height: 30px;
-  color: var(--navy-850);
-  display: inline-flex;
-  align-items: center;
-}
-.brand .logo svg {
-  height: 100%;
-  width: auto;
-  display: block;
-}
+/* The brand is a plain "MT AUTO" wordmark — no graphical mark. */
 .shell-body {
   display: flex;
   flex: 1;
@@ -3049,14 +3037,7 @@
 }
 
 @media (max-width: 560px) {
-  /* Signed-in header: logo-only brand + avatar-only account chip. */
-  .shell-head .brand {
-    font-size: 0;
-    gap: 0;
-  }
-  .shell-head .brand .logo {
-    font-size: 14px;
-  }
+  /* Signed-in header: MT AUTO wordmark + avatar-only account chip. */
   .acct-btn > span:not(.avatar) {
     display: none;
   }

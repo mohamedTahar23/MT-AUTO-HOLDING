@@ -87,7 +87,7 @@ Any 6-digit OTP verifies; any other email routes to the join-request form.
     bottom tab bar (`.mnav`, testids `mnav-*`).
   - **The shell must never overflow horizontally** — in RTL an overflowing
     page shifts leftward and mis-anchors every `position: fixed` overlay
-    (account popup, toasts). ≤560px the header compacts to logo-only brand +
+    (account popup, toasts). ≤560px the header keeps the MT AUTO wordmark +
     avatar-only account chip; the phone e2e project asserts the invariant.
   - The account area (settings / team / activity) is **not routed** — it opens
     as a blurred-backdrop popup (see «Account area» below). `openAccountModal`

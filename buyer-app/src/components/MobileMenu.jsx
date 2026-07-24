@@ -1,5 +1,3 @@
-import { Logo } from '../icons.jsx'
-
 export default function MobileMenu({ app }) {
   const { s, closeMenu, openContact, goOrder, goLogin } = app
   return (
@@ -7,7 +5,7 @@ export default function MobileMenu({ app }) {
       <div className="scrim" onClick={closeMenu}></div>
       <div className="sheet">
         <div className="mh">
-          <a className="brand" href="#" onClick={(e) => { e.preventDefault(); closeMenu() }}><span className="mark"><Logo /></span><span className="wm"><b style={{ color: 'var(--ink)' }}>MT AUTO</b></span></a>
+          <a className="brand" href="#" onClick={(e) => { e.preventDefault(); closeMenu() }}><span className="wm"><b style={{ color: 'var(--ink)' }}>MT AUTO</b></span></a>
           <button className="x" type="button" onClick={closeMenu} aria-label="إغلاق"><svg viewBox="0 0 24 24" fill="none"><path d="M6 6l12 12M18 6L6 18" stroke="currentColor" strokeWidth="2" strokeLinecap="round" /></svg></button>
         </div>
         <a href="#how" onClick={closeMenu}><svg viewBox="0 0 24 24" fill="none"><circle cx="12" cy="12" r="9" stroke="currentColor" strokeWidth="1.7" /><path d="M12 16v-4M12 8h.01" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" /></svg> كيف نعمل</a>
