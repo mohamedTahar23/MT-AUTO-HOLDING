@@ -16,7 +16,7 @@ and `seller-app/README.md` — don't duplicate those here or there.
   is actually in question.
 - **Short replies.** No recap of what you just did, no file listings, no
   summaries of code you didn't change.
-
+ 
   
 ## Repo layout
 
