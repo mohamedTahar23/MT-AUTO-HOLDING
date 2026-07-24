@@ -74,7 +74,7 @@ export const tasks = [
   {
     id: 'MT-10482',
     createdAt: mins(7),
-    part: { name: 'مضخة ماء', ref: 'RAF-2231' },
+    part: { name: 'Pompe à eau', ref: 'RAF-2231' },
     car: { make: 'Volkswagen', model: 'Golf 7', year: 2016, engine: '1.6 TDI' },
     buyerPhotoUrl: photoThumb('#0E2042'),
     prefBrand: 'Hepu',
@@ -86,7 +86,7 @@ export const tasks = [
   {
     id: 'MT-10488',
     createdAt: mins(21),
-    part: { name: 'أقراص فرامل أمامية', ref: 'RAF-4417' },
+    part: { name: 'Disques de frein avant', ref: 'RAF-4417' },
     car: { make: 'Peugeot', model: '308', year: 2014, engine: '1.6 HDi' },
     buyerPhotoUrl: '',
     prefBrand: 'Bosch',
@@ -98,7 +98,7 @@ export const tasks = [
   {
     id: 'MT-10495',
     createdAt: mins(46),
-    part: { name: 'مصباح أمامي أيسر', ref: 'RAF-8890' },
+    part: { name: 'Phare avant gauche', ref: 'RAF-8890' },
     car: { make: 'Renault', model: 'Clio 4', year: 2018, engine: '1.5 dCi' },
     buyerPhotoUrl: '',
     prefBrand: 'Valeo',
@@ -109,7 +109,7 @@ export const tasks = [
   {
     id: 'MT-10501',
     createdAt: mins(72),
-    part: { name: 'مساعد أمامي', ref: 'RAF-1120' },
+    part: { name: 'Amortisseur avant', ref: 'RAF-1120' },
     car: { make: 'Hyundai', model: 'i30', year: 2015, engine: '1.4' },
     buyerPhotoUrl: '',
     prefBrand: 'Monroe',
@@ -121,7 +121,7 @@ export const tasks = [
   {
     id: 'MT-10506',
     createdAt: mins(96),
-    part: { name: 'طقم قابض', ref: 'RAF-3382' },
+    part: { name: "Kit d'embrayage", ref: 'RAF-3382' },
     car: { make: 'Citroën', model: 'C4', year: 2017, engine: '1.6 HDi' },
     buyerPhotoUrl: '',
     prefBrand: 'Valeo',
@@ -133,7 +133,7 @@ export const tasks = [
   {
     id: 'MT-10510',
     createdAt: mins(120),
-    part: { name: 'بطارية 60 أمبير', ref: 'RAF-6605' },
+    part: { name: 'Batterie 60 Ah', ref: 'RAF-6605' },
     car: { make: 'Kia', model: 'Sportage', year: 2019, engine: '1.6 GDI' },
     buyerPhotoUrl: photoThumb('#143058'),
     prefBrand: 'Varta',
@@ -145,7 +145,7 @@ export const tasks = [
   {
     id: 'MT-10515',
     createdAt: mins(150),
-    part: { name: 'ذراع مساحات أمامي', ref: 'RAF-7742' },
+    part: { name: "Bras d'essuie-glace avant", ref: 'RAF-7742' },
     car: { make: 'Nissan', model: 'Qashqai', year: 2016, engine: '1.5 dCi' },
     buyerPhotoUrl: '',
     prefBrand: 'Bosch',
@@ -164,7 +164,7 @@ export const offers = [
   {
     id: 'of_q1',
     taskId: 'MT-10501',
-    partName: 'مساعد أمامي',
+    partName: 'Amortisseur avant',
     car: 'Hyundai i30 2015',
     ref: 'RAF-1120',
     price: 5200,
@@ -179,7 +179,7 @@ export const offers = [
   {
     id: 'of_q2',
     taskId: 'MT-10501',
-    partName: 'مساعد أمامي',
+    partName: 'Amortisseur avant',
     car: 'Hyundai i30 2015',
     ref: 'RAF-1120',
     price: 4700,
@@ -194,7 +194,7 @@ export const offers = [
   {
     id: 'of_1',
     taskId: 'MT-10470',
-    partName: 'فلتر زيت',
+    partName: 'Filtre à huile',
     car: 'Toyota Corolla 2017',
     ref: 'RAF-9954',
     price: 1800,
@@ -209,7 +209,7 @@ export const offers = [
   {
     id: 'of_2',
     taskId: 'MT-10465',
-    partName: 'طرمبة بنزين',
+    partName: 'Pompe à carburant',
     car: 'Seat Ibiza 2013',
     ref: '', // no reference recorded — table shows an empty cell
     price: 6400,
@@ -224,7 +224,7 @@ export const offers = [
   {
     id: 'of_3',
     taskId: 'MT-10459',
-    partName: 'قرص دبرياج',
+    partName: "Disque d'embrayage",
     car: 'Dacia Logan 2016',
     ref: 'RAF-5531',
     price: 9200,
@@ -239,7 +239,7 @@ export const offers = [
   {
     id: 'of_won2',
     taskId: 'MT-10430',
-    partName: 'رادياتير مكيّف',
+    partName: 'Radiateur de climatisation',
     car: 'BMW Série 3 2018',
     ref: 'RAF-7810',
     price: 62000, // > 50 000 دج → 6% commission tier
@@ -254,7 +254,7 @@ export const offers = [
   {
     id: 'of_lost',
     taskId: 'MT-10412',
-    partName: 'مقصّ أمامي',
+    partName: 'Triangle de suspension avant',
     car: 'Peugeot 208 2015',
     ref: '',
     price: 4800,
@@ -274,7 +274,7 @@ export const orders = [
   {
     id: 'MT-10459',
     offerId: 'of_3',
-    partName: 'قرص دبرياج',
+    partName: "Disque d'embrayage",
     car: 'Dacia Logan 2016',
     brand: 'Valeo',
     price: 9200,
@@ -288,7 +288,7 @@ export const orders = [
   {
     id: 'MT-10440',
     offerId: 'of_old_1',
-    partName: 'مروحة تبريد',
+    partName: 'Ventilateur de refroidissement',
     car: 'Kia Picanto 2019',
     brand: 'NRF',
     price: 7300,
@@ -302,7 +302,7 @@ export const orders = [
   {
     id: 'MT-10422',
     offerId: 'of_old_2',
-    partName: 'ذراع تعليق',
+    partName: 'Bras de suspension',
     car: 'Ford Fiesta 2015',
     brand: 'TRW',
     price: 5100,
@@ -317,7 +317,7 @@ export const orders = [
   {
     id: 'MT-10405',
     offerId: 'of_old_3',
-    partName: 'حساس أكسجين',
+    partName: 'Sonde lambda',
     car: 'Chevrolet Aveo 2014',
     brand: 'NGK',
     price: 3600,

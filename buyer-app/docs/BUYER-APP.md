@@ -114,7 +114,8 @@ There is no routing: which "screen" you see is a function of state
      17-char cap, requires an "I confirm the VIN is correct" checkbox once ≥11
      chars), or manual make/model/year/fuel. Optional: engine code, car note.
      Continue requires either a confirmed VIN or make+model+year.
-   - **Step 2 — القطعة:** part name (any language, "photo and description suffice"),
+   - **Step 2 — القطعة:** part name (French is the platform's canonical form, but
+     the field accepts Arabic/Darija too — "photo and description suffice"),
      up to 4 photo slots, an ECU-not-supported notice, optional part reference
      number / preferred + alternate brand / quantity / free note (the placeholder
      shows Darija examples). "+ أضف قطعة أخرى" banks the current part and clears the

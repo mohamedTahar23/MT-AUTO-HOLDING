@@ -38,7 +38,9 @@ export const WILAYAS = [
 export const WHATSAPP = 'https://api.whatsapp.com/send?phone=213659401338'
 
 // Reverse-marketplace maintenance keywords (drives the "تذكير الصيانة" affordance).
-export const MAINT_RE = /زيت|زيوت|فلتر|فلاتر|فيلتر|بلاكي|تيل|فرامل|قرص|أقراص|مساح|ماسح|بوجيه|شمع|سير|سيور|بطاري|إطار|اطار|عجل|تبريد|سائل|شحم|كلاتش|قابض/
+// Part names are French platform-wide, but the buyer may still describe a part in
+// Arabic/Darija — so match both. Case-insensitive: French part names are capitalized.
+export const MAINT_RE = /زيت|زيوت|فلتر|فلاتر|فيلتر|بلاكي|تيل|فرامل|قرص|أقراص|مساح|ماسح|بوجيه|شمع|سير|سيور|بطاري|إطار|اطار|عجل|تبريد|سائل|شحم|كلاتش|قابض|huile|filtre|frein|plaquette|disque|essuie|bougie|courroie|batterie|pneu|embrayage|amortisseur|radiateur|vidange|liquide/i
 
 export const phoneOk = (p) => /^0[5-7]\d{8}$/.test(p || '')
 export const onlyDigits = (s, n) => (s || '').replace(/\D/g, '').slice(0, n)

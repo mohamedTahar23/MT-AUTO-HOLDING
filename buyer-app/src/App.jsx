@@ -118,7 +118,7 @@ export default function App() {
   const rmPhoto = () => patch((p) => ({ pPhotos: Math.max(0, p.pPhotos - 1) }))
   const addPart = () => {
     if (!s.pName.trim() && s.pPhotos <= 0) return
-    const part = { name: s.pName.trim() || 'قطعة (بالصورة)', ref: s.pRef.trim(), qty: s.pQty || '1', photos: s.pPhotos, brand: s.pBrand.trim(), note: s.pNote.trim() }
+    const part = { name: s.pName.trim() || 'Pièce (photo)', ref: s.pRef.trim(), qty: s.pQty || '1', photos: s.pPhotos, brand: s.pBrand.trim(), note: s.pNote.trim() }
     patch((p) => ({ parts: [...p.parts, part], pName: '', pRef: '', pBrand: '', pBrandAlt: '', pQty: '1', pNote: '', pPhotos: 0 }))
   }
   const rmPart = (i) => patch((p) => ({ parts: p.parts.filter((_, j) => j !== i) }))
@@ -140,7 +140,7 @@ export default function App() {
   const startSubmit = () => { if (!(detailsOk() && partOk())) return; patch({ termsOpen: true, termsGate: true }) }
   const submitRequest = () => {
     const code = genOrder()
-    const part = (s.parts[0] && s.parts[0].name) || s.pName || 'قطعة'
+    const part = (s.parts[0] && s.parts[0].name) || s.pName || 'Pièce'
     const car = s.make ? `${s.make} ${s.model} ${s.year}` : 'مركبتي'
     patch((p) => ({
       loggedIn: true, orders: [{ code, part, car, status: 'sourcing', date: 'اليوم' }, ...p.orders],
@@ -201,7 +201,7 @@ export default function App() {
     let sumP = '—'
     if (s.parts.length) sumP = s.parts.map((p) => p.name).join('، ') + (curName ? '، ' + curName : '')
     else if (curName) sumP = curName
-    else if (s.pPhotos > 0) sumP = 'قطعة (بالصورة)'
+    else if (s.pPhotos > 0) sumP = 'Pièce (photo)'
     const photoCount = s.parts.reduce((a, p) => a + (p.photos || 0), 0) + s.pPhotos
     const sumPhotos = photoCount > 0 ? photoCount + ' صورة' : 'بدون صور'
 

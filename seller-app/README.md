@@ -60,7 +60,7 @@ seller-app/
    ├─ api/
    │  ├─ index.js             # ★ THE swap-in boundary (see below)
    │  ├─ mock.js              # in-memory adapter enforcing the business rules
-   │  └─ seed.js              # demo data shaped like the Data Contract
+   │  └─ seed.js              # demo data shaped like the Data Contract (part names in French)
    ├─ styles/                 # site.css (reused) · tokens.css · app.css
    └─ components/
       ├─ auth/                # LoginGate (landing orchestrator) · Otp · ApplyForm · UnderReview

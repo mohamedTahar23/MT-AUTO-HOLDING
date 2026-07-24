@@ -72,6 +72,15 @@ Everything is Arabic RTL (`dir="rtl" lang="ar"`).
 - **Numbers/refs/phones/VINs sit in LTR islands** (`<Ltr>` in the seller app,
   `dir="ltr"` + `<bdi>` / `.num` in the buyer app); layout uses logical
   properties only.
+- **Spare-part names are French, platform-wide.** Every part name the platform
+  itself authors — seller-app `api/seed.js` (`part.name`, `partName`), buyer-app
+  defaults/examples in `App.jsx` + `data.js` — is a French auto-parts term
+  (`Disques de frein avant`, `Amortisseur avant`, `Filtre à huile`, `Kit
+  d'embrayage`). Buyers may still *describe* a part in Arabic/Darija + photo in
+  the request wizard (that stays), but the stored/displayed name is French. Any
+  logic keyed off part-name text must handle French: `MAINT_RE` (buyer `data.js`)
+  matches French **and** Arabic keywords, case-insensitively, for exactly this
+  reason.
 
 ## Workflow
 
