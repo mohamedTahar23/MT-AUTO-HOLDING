@@ -43,6 +43,15 @@ export default function Queue({ onData }) {
       else next.add(b)
       return next
     })
+  // Country heading = bulk toggle: if every brand in the group is already
+  // selected, clear the whole group; otherwise select all of it.
+  const toggleCountry = (list) =>
+    setBrands((prev) => {
+      const next = new Set(prev)
+      const allOn = list.every((b) => next.has(b))
+      list.forEach((b) => (allOn ? next.delete(b) : next.add(b)))
+      return next
+    })
 
   if (tasks === null) return <Loading />
 
@@ -89,7 +98,7 @@ export default function Queue({ onData }) {
           <h2 className="h1" style={{ fontSize: 16, margin: 0 }}>
             طلبات مفتوحة للتسعير
           </h2>
-          <BrandFilter groups={brandGroups} selected={brands} onToggle={toggleBrand} onClear={() => setBrands(new Set())} />
+          <BrandFilter groups={brandGroups} selected={brands} onToggle={toggleBrand} onToggleCountry={toggleCountry} onClear={() => setBrands(new Set())} />
         </div>
 
         {tasks.length === 0 ? (

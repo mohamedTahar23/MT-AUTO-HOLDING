@@ -110,7 +110,8 @@ Any 6-digit OTP verifies; any other email routes to the join-request form.
   identity), `api.getOrders()` (to surface a priority "مطلوب فيديو" strip when a
   won order has `proofStatus === 'بانتظار'`), `api.getOffers()` (tasks with a
   live `sent` offer render as already priced), `api.getMeta().carBrandGroups`
-  (brand filter), `api.getAds()` (sponsored rail carousel); `ageLabel` from
+  (brand filter — tapping a country heading selects/clears every brand in that
+  group), `api.getAds()` (sponsored rail carousel); `ageLabel` from
   `format.js` for card ages.
 - **Mutations:** none directly — opens `OfferModal` (submit) and `VideoModal`
   (proof upload); both refresh via `load()` + `onData`.
