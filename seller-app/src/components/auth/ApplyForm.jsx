@@ -163,7 +163,6 @@ export default function ApplyForm({ email, onSubmit, onBack }) {
 
           <h3 style={sec}>2 · التخصّص والموقع</h3>
           <div className="field">
-            <label>الماركات والسيارات التي تخدمها</label>
             <div className="row wrap" style={{ gap: 8 }}>
               {brandChips.map((c) => (
                 <button
