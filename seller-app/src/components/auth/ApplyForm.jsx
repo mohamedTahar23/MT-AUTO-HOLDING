@@ -167,7 +167,7 @@ export default function ApplyForm({ email, onSubmit, onBack }) {
           <div className="field">
             <label>موقع المحل على الخريطة (اختياري)</label>
             <div className="hint" style={{ marginBottom: 8 }}>
-              حدِّد موقع محلك على الخريطة ليصل إليه المشترون بسهولة — اضغط «حدّد موقعي» أو انقر على الخريطة واسحب الدبوس.
+              اضغط «حدّد موقعي» أو انقر على الخريطة واسحب الدبوس.
             </div>
             <LocationPicker value={f.gGeo} onChange={(geo) => set('gGeo', geo)} />
           </div>
