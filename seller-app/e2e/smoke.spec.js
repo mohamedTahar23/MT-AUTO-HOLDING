@@ -223,7 +223,7 @@ test('my offers: won banner, stat tiles, grouped table and status badges', async
   const banner = page.getByTestId('won-banner')
   await expect(banner).toBeVisible()
   await expect(banner).toContainText('تم تأكيد الطلب')
-  await expect(banner).toContainText('رادياتير مكيّف')
+  await expect(banner).toContainText('Radiateur de climatisation')
 
   // Tiles derive from the same offers list: 1 video / 4 review / 1 won.
   await expect(page.getByTestId('stat-video')).toContainText('1')

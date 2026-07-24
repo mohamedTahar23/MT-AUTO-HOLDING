@@ -116,7 +116,8 @@ All three steps render inside `AccountSection.jsx` under a 3-node stepper;
 - **Shown when:** `s.hubOpen` — a full-screen overlay,
   [`OrdersHub.jsx`](../src/components/OrdersHub.jsx).
 - **Reads:** `vm.orders` — each order decorated with `BSTAT` chip label/colors,
-  `done` (delivered/complete), `remind` (part name matches `MAINT_RE`), and a
+  `done` (delivered/complete), `remind` (part name matches `MAINT_RE` — French
+  or Arabic maintenance keywords, case-insensitive), and a
   prebuilt WhatsApp `remindHref`.
 - **Mutations:** `closeHub`, `openOrderJourney(o)` / `closeOrderJourney`,
   `reorderOrder(o)` (reopens the wizard prefilled with the order's part name),
