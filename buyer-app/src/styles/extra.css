@@ -18,6 +18,21 @@ html, body { margin: 0; background: var(--bg); }
     var(--navy-850);
 }
 
+/* ============ Brand logo ============
+   The design bundle ships a placeholder amber "MT" badge for `.brand .mark`
+   (site.css, kept verbatim). Slot the real MT AUTO logo SVG in its place here:
+   drop the square/gradient, size to the header, and let the one-color SVG take
+   its fill from `color` — white on the dark site-head, ink on the light
+   mobile-menu sheet. */
+.brand .mark{
+  width:auto;height:38px;border-radius:0;
+  background:none;box-shadow:none;padding:0;
+  display:inline-flex;align-items:center;
+  color:#fff;
+}
+.brand .mark svg{height:100%;width:auto;display:block;}
+.mobile-menu .brand .mark{color:var(--ink);}
+
 .mysr-fab{position:fixed;inset-inline-start:24px;bottom:24px;z-index:95;width:60px;height:60px;border-radius:50%;border:none;cursor:pointer;background:var(--navy-800);color:#fff;box-shadow:0 10px 26px rgba(10,24,48,.34);display:grid;place-items:center;transition:background .15s,transform .15s;}
 .mysr-fab:hover{background:var(--navy-700);transform:translateY(-1px);}
 .mysr-panel{position:fixed;inset-inline-start:24px;bottom:24px;z-index:96;width:372px;max-width:calc(100vw - 32px);height:582px;max-height:calc(100vh - 40px);background:var(--card);border:1px solid var(--line);border-radius:20px;box-shadow:0 26px 72px rgba(8,16,30,.42);display:flex;flex-direction:column;overflow:hidden;}
