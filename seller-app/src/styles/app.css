@@ -1752,6 +1752,52 @@
   gap: 6px;
 }
 
+/* Store-location picker (apply form) — Leaflet map + geolocation. */
+.loc-picker {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+.loc-actions {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  flex-wrap: wrap;
+}
+.loc-coords {
+  font-size: 12.5px;
+  font-weight: 700;
+  color: var(--navy-850);
+  font-variant-numeric: tabular-nums;
+}
+.loc-empty {
+  font-size: 12.5px;
+  color: var(--faint);
+}
+.loc-clear {
+  border: 0;
+  background: none;
+  color: var(--amber-text);
+  font-weight: 800;
+  font-size: 12.5px;
+  cursor: pointer;
+  font-family: inherit;
+}
+.loc-clear:hover {
+  text-decoration: underline;
+}
+.loc-map {
+  height: 240px;
+  border-radius: 12px;
+  overflow: hidden;
+  border: 1px solid var(--line);
+  z-index: 0; /* keep Leaflet panes/controls under app modals */
+}
+.loc-pin {
+  background: none;
+  border: 0;
+}
+
 /* ---- Request card extras ---- */
 .buyer-chip {
   display: inline-flex;

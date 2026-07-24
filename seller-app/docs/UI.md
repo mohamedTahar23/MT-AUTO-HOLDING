@@ -60,7 +60,10 @@ Any 6-digit OTP verifies; any other email routes to the join-request form.
 
 - **Components:** [`auth/ApplyForm.jsx`](../src/components/auth/ApplyForm.jsx)
   (SELLER-2 enrollment payload: shop name, wilaya, phones, address, owner,
-  brand chips, Google-Maps URL validated against a maps-domain regex),
+  brand chips, and an **optional** store location picked on an interactive map
+  — [`auth/LocationPicker.jsx`](../src/components/auth/LocationPicker.jsx),
+  Leaflet + OpenStreetMap, geolocation button + draggable pin — persisted as a
+  `maps?q=lat,lng` URL in `mapsUrl` so settings/seed stay unchanged),
   [`auth/UnderReview.jsx`](../src/components/auth/UnderReview.jsx).
 - **Reads:** `api.getMeta()` (brand chips, wilayas).
 - **Mutations:** `api.applyShop(payload)` — creates a `review`-status shop and a
