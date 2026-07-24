@@ -4,26 +4,15 @@ import Header from './Header.jsx'
 import Sidebar from './Sidebar.jsx'
 import MobileNav from './MobileNav.jsx'
 import R2Banner from './R2Banner.jsx'
-import Queue from '../screens/Queue.jsx'
-import MyOffers from '../screens/MyOffers.jsx'
-import Deliveries from '../screens/Deliveries.jsx'
-import Payouts from '../screens/Payouts.jsx'
-import Performance from '../screens/Performance.jsx'
-import Messages from '../screens/Messages.jsx'
+import { SCREEN_COMPONENTS } from '../screens/registry.jsx'
 import ComingSoon from '../screens/ComingSoon.jsx'
 import BuyLanding from '../buy/BuyLanding.jsx'
 
-// Full-page sell-dashboard screens only. The owner account area (settings /
-// team / activity) is NOT routed — it opens as a blurred popup from the header
-// account menu (store.accountModal → AccountModal).
-const SCREENS = {
-  queue: Queue,
-  quotes: MyOffers,
-  deliveries: Deliveries,
-  payouts: Payouts,
-  performance: Performance,
-  messages: Messages,
-}
+// Routed full-page screens come from the shared registry (screens/registry.jsx)
+// — the single source of truth the dev menu also reads, so a new screen added
+// there is instantly both routable and listed in DevPanel. The owner account
+// area (settings / team / activity) is NOT routed — it opens as a blurred popup
+// from the header account menu (store.accountModal → AccountModal).
 
 export default function AppShell() {
   const { api, route, shop, isOwner, mode } = useApp()
@@ -43,7 +32,7 @@ export default function AppShell() {
     loadCounts()
   }, [route.name, loadCounts])
 
-  const Screen = SCREENS[route.name]
+  const Screen = SCREEN_COMPONENTS[route.name]
   const r2 = shop?.r2?.active
 
   // Buy mode (header toggle) — the wholesale coming-soon landing, full width:

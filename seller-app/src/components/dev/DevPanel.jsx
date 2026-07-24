@@ -1,6 +1,7 @@
 import { useState } from 'react'
 import { useApp } from '../../state/store.jsx'
 import { useDevMode } from '../../lib/devmode.js'
+import { SCREENS } from '../screens/registry.jsx'
 
 // Sits above every product layer (modals/mobile-nav top out at z-index 120).
 const Z = 2147483000
@@ -38,15 +39,6 @@ function Btn({ active, disabled, onClick, children, primary }) {
       : { ...base, background: 'rgba(255,255,255,.1)', color: '#fff' }
   return <button type="button" disabled={disabled} onClick={onClick} style={style}>{children}</button>
 }
-
-const SCREENS = [
-  { name: 'queue', label: 'طابور التسعير' },
-  { name: 'quotes', label: 'عروضي' },
-  { name: 'deliveries', label: 'التسليمات' },
-  { name: 'payouts', label: 'الأرباح' },
-  { name: 'performance', label: 'الأداء' },
-  { name: 'messages', label: 'الرسائل' },
-]
 
 /**
  * Floating navigator. The launcher is ALWAYS visible so dev mode is reachable

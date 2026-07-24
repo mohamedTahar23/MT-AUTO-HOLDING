@@ -7,9 +7,15 @@ rather than repeats them.
 
 **Routing** is a `{ name, params }` object in
 [`src/state/store.jsx`](../src/state/store.jsx) (`navigate(name)`), rendered by
-[`AppShell.jsx`](../src/components/shell/AppShell.jsx)'s `SCREENS` map. The
-top-level gate in [`App.jsx`](../src/App.jsx) is: no session → `AuthFlow`; shop
-status `review` → `UnderReview`; otherwise → `AppShell`. The store exposes
+[`AppShell.jsx`](../src/components/shell/AppShell.jsx) from the shared screen
+registry [`components/screens/registry.jsx`](../src/components/screens/registry.jsx)
+— the single source of truth for full-page screens (route `name` + `Component` +
+dev-menu `label`). The dev menu ([`dev/DevPanel.jsx`](../src/components/dev/DevPanel.jsx))
+reads the same list, so a screen added to the registry is automatically both
+routable and shown in dev mode. (The sidebar is a curated subset — see
+`Sidebar.jsx` `SELL` — so it does not derive from the registry.) The top-level
+gate in [`App.jsx`](../src/App.jsx) is: no session → `AuthFlow`; shop status
+`review` → `UnderReview`; otherwise → `AppShell`. The store exposes
 `api`, `session`, `shop`, `route`, `mode` (sell ⇄ buy, persisted to
 localStorage), `accountModal` + `openAccountModal` / `closeAccountModal` (the
 owner account-area popups — see below), `toast(s)`, `isOwner`, and `perms`.
