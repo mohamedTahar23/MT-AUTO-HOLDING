@@ -288,13 +288,15 @@ only the Settings section has footer actions.
 
 ## Dev mode (browse-anywhere)
 
-- **Shown when:** the dev flag is on —
-  [`components/dev/DevPanel.jsx`](../src/components/dev/DevPanel.jsx) renders
-  `null` otherwise. **Off by default**, so it never affects the product or the
-  e2e suite.
-- **Enable / disable:** `?dev` (or `?dev=1`) in the URL, `?dev=0` to turn off,
-  or the **Ctrl/⌘+Shift+D** shortcut. The choice persists in `localStorage`
-  (`mtseller.devmode`). State + hook live in
+- **Shown when:** a 🛠️ launcher pinned to the inline-start edge (vertically
+  centred) is **always visible** —
+  [`components/dev/DevPanel.jsx`](../src/components/dev/DevPanel.jsx). Clicking it
+  switches dev mode **on**; the dev behaviours (no-OTP sign-in, full nav panel)
+  stay **off until that click**, so the launcher's presence is the only change to
+  a normal visit and the e2e suite (which never clicks it) is unaffected.
+- **Enable / disable:** click the launcher, or `?dev` (`?dev=1`) in the URL /
+  `?dev=0` to force off, or the **Ctrl/⌘+Shift+D** shortcut. The choice persists
+  in `localStorage` (`mtseller.devmode`). State + hook live in
   [`lib/devmode.js`](../src/lib/devmode.js).
 - **What it does:** the floating panel signs in without OTP (as owner `u_owner`
   or employee `u_emp_1`) via the mock-only `api._devSignIn(userId)` helper — a
