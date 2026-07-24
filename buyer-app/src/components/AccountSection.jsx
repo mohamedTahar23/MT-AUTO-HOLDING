@@ -19,7 +19,6 @@ function LoginCard({ app }) {
         {s.loginStage === 'phone' && (
           <>
             <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', textAlign: 'center', marginBottom: 20 }}>
-              <span style={{ width: 60, height: 60, borderRadius: 17, background: 'linear-gradient(150deg,var(--amber),#FFB35C)', color: 'var(--navy-900)', display: 'grid', placeItems: 'center', fontWeight: 800, fontSize: 19, boxShadow: 'var(--sh-sm)', marginBottom: 13 }}>MT</span>
               <b style={{ fontSize: 20, fontWeight: 800, color: 'var(--ink)' }}>تسجيل الدخول</b>
               <span style={{ marginTop: 5, fontSize: 13.5, lineHeight: 1.7, color: 'var(--muted)', maxWidth: 300 }}>ادخل لمتابعة طلباتك وعروض الأسعار في مكانٍ واحد.</span>
             </div>

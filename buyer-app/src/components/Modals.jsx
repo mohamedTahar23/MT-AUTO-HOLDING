@@ -16,7 +16,6 @@ export function ContactModal({ app }) {
         </div>
         <div className="mbody">
           <div style={{ display: 'flex', alignItems: 'center', gap: 13, padding: '14px 15px', background: 'linear-gradient(155deg,var(--navy-tint),var(--card) 88%)', border: '1px solid var(--navy-line)', borderRadius: 'var(--r-lg)', marginBottom: 13 }}>
-            <span style={{ flex: 'none', width: 48, height: 48, borderRadius: 13, background: 'linear-gradient(150deg,var(--amber),#FFB35C)', color: 'var(--navy-900)', display: 'grid', placeItems: 'center', fontWeight: 800, fontSize: 16, boxShadow: 'var(--sh-sm)' }}>MT</span>
             <div style={{ flex: 1, minWidth: 0 }}>
               <b style={{ display: 'block', fontSize: 14.5, fontWeight: 800, color: 'var(--ink)', lineHeight: 1.35 }}>محل محمد الطاهر لقطع الغيار</b>
               <span style={{ display: 'block', fontSize: 12.5, color: 'var(--muted)', fontWeight: 600, marginTop: 2 }}>الحجار، ولاية عنابة</span>
