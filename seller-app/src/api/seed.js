@@ -526,7 +526,7 @@ export const countries = [
 export const brandChips = [
   'Volkswagen', 'Citroën', 'Peugeot', 'Renault', 'Toyota', 'Kia', 'Hyundai',
   'Fiat', 'Seat', 'Škoda', 'Ford', 'Chevrolet', 'Dacia', 'Suzuki', 'Nissan',
-  'Mercedes', 'قطع عامة', 'سيارات صينية',
+  'Mercedes', 'سيارات صينية', 'قطع غيار كهرباء السيارات',
 ]
 
 // Car makes grouped by origin — powers the queue's "تصفية حسب الماركة" filter.
