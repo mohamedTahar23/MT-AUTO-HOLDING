@@ -59,8 +59,8 @@ Any 6-digit OTP verifies; any other email routes to the join-request form.
 ### Join request (apply) + under review
 
 - **Components:** [`auth/ApplyForm.jsx`](../src/components/auth/ApplyForm.jsx)
-  (SELLER-2 enrollment payload: shop name, wilaya, phones, address, owner, NIF,
-  RC, brand chips, Google-Maps URL validated against a maps-domain regex),
+  (SELLER-2 enrollment payload: shop name, wilaya, phones, address, owner,
+  brand chips, Google-Maps URL validated against a maps-domain regex),
   [`auth/UnderReview.jsx`](../src/components/auth/UnderReview.jsx).
 - **Reads:** `api.getMeta()` (brand chips, wilayas).
 - **Mutations:** `api.applyShop(payload)` — creates a `review`-status shop and a

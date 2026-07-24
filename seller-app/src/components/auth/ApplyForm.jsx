@@ -14,8 +14,6 @@ export default function ApplyForm({ email, onSubmit, onBack }) {
     gPhone2: '',
     gAddress: '',
     gOwner: '',
-    gNif: '',
-    gRc: '',
     gChips: [],
     gMapsUrl: '',
   })
@@ -49,8 +47,6 @@ export default function ApplyForm({ email, onSubmit, onBack }) {
       gPhone2: '',
       gAddress: 'حي المنظر الجميل، الشارع الرئيسي، عنابة',
       gOwner: 'محمد الأطلسي',
-      gNif: '',
-      gRc: '',
       gChips: ['Volkswagen', 'Peugeot', 'Renault'],
       gMapsUrl: 'https://maps.google.com/?q=Atlas+Auto+Annaba',
     })
@@ -162,10 +158,6 @@ export default function ApplyForm({ email, onSubmit, onBack }) {
                 value={f.gOwner}
                 onChange={(e) => set('gOwner', e.target.value)}
               />
-            </div>
-            <div className="field grow">
-              <label>NIF / RC (اختياري)</label>
-              <input className="input ltr" value={f.gNif} onChange={(e) => set('gNif', e.target.value)} />
             </div>
           </div>
 
